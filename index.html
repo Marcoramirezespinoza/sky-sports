@@ -1,0 +1,491 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0C1524">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Cancha">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Crect width='96' height='96' rx='20' fill='%230C1524'/%3E%3Cpath d='M26 62 40 40l12 14 8-20 4 28' fill='none' stroke='%235A82FF' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%230C1524'/%3E%3Cpath d='M48 118 76 74l22 26 16-38 8 54' fill='none' stroke='%235A82FF' stroke-width='11' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+</head>
+<body>
+<title>Cancha — Prototipo navegable · Sky Sports Chile</title>
+<style>
+  :root{
+    --ground:#F4F6FB;--surface:#FFFFFF;--surface-2:#EFF2F9;--text:#0C1524;--muted:#56637E;
+    --line:#E0E6F1;--brand:#2E5BFF;--brand-soft:#E4EBFF;--spark:#F0453A;
+    --good:#0E9F6E;--warn:#C77A05;--bad:#E02424;--good-bg:#DEF7EC;--warn-bg:#FDF6B2;--bad-bg:#FDE8E8;
+    --shadow:0 1px 2px rgba(12,21,36,.06),0 8px 24px -12px rgba(12,21,36,.14);
+  }
+  @media (prefers-color-scheme:dark){:root{
+    --ground:#080D18;--surface:#111A2C;--surface-2:#17223A;--text:#EAF0FA;--muted:#8B9AB8;
+    --line:#21304C;--brand:#5A82FF;--brand-soft:#1B2A4D;--spark:#FF5A4D;
+    --good:#34D399;--warn:#FBBF24;--bad:#FB7185;--good-bg:#0C2B22;--warn-bg:#2E2607;--bad-bg:#2E1216;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 18px 40px -20px rgba(0,0,0,.6);}}
+  :root[data-theme="light"]{--ground:#F4F6FB;--surface:#FFFFFF;--surface-2:#EFF2F9;--text:#0C1524;--muted:#56637E;--line:#E0E6F1;--brand:#2E5BFF;--brand-soft:#E4EBFF;--spark:#F0453A;--good:#0E9F6E;--warn:#C77A05;--bad:#E02424;--good-bg:#DEF7EC;--warn-bg:#FDF6B2;--bad-bg:#FDE8E8;--shadow:0 1px 2px rgba(12,21,36,.06),0 8px 24px -12px rgba(12,21,36,.14);}
+  :root[data-theme="dark"]{--ground:#080D18;--surface:#111A2C;--surface-2:#17223A;--text:#EAF0FA;--muted:#8B9AB8;--line:#21304C;--brand:#5A82FF;--brand-soft:#1B2A4D;--spark:#FF5A4D;--good:#34D399;--warn:#FBBF24;--bad:#FB7185;--good-bg:#0C2B22;--warn-bg:#2E2607;--bad-bg:#2E1216;--shadow:0 1px 2px rgba(0,0,0,.3),0 18px 40px -20px rgba(0,0,0,.6);}
+
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased}
+  h1,h2,h3{margin:0;letter-spacing:-.02em}
+  .num{font-variant-numeric:tabular-nums}
+  button{font:inherit;cursor:pointer}
+  ::-webkit-scrollbar{width:9px;height:9px}::-webkit-scrollbar-thumb{background:var(--line);border-radius:9px}
+
+  /* glyph */
+  .glyph{width:28px;height:28px;border-radius:8px;flex:none;background:linear-gradient(135deg,var(--brand),color-mix(in srgb,var(--brand) 55%,var(--spark)));position:relative}
+  .glyph::after{content:"";position:absolute;inset:0;border-radius:8px;opacity:.92;background:
+    linear-gradient(to top,var(--spark) 0 3px,transparent 3px) bottom left/33% 62% no-repeat,
+    linear-gradient(to top,#fff 0 3px,transparent 3px) bottom center/33% 100% no-repeat,
+    linear-gradient(to top,var(--spark) 0 3px,transparent 3px) bottom right/33% 44% no-repeat;}
+
+  /* ── LOGIN ── */
+  #login{min-height:100vh;display:grid;place-items:center;padding:24px}
+  .login-card{width:100%;max-width:440px;background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:26px}
+  .login-card .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px;letter-spacing:-.03em}
+  .login-card .brand small{font-weight:500;font-size:11px;color:var(--muted)}
+  .login-sub{color:var(--muted);font-size:13.5px;margin:14px 0 18px}
+  .role-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .role-btn{display:flex;flex-direction:column;gap:3px;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 13px;transition:.15s}
+  .role-btn:hover{border-color:var(--brand);transform:translateY(-2px)}
+  .role-btn .rn{font-weight:700;font-size:13.5px;display:flex;align-items:center;gap:7px}
+  .role-btn .rd{font-size:11px;color:var(--muted)}
+  .role-btn.socio{grid-column:1/-1;background:var(--brand-soft);border-color:transparent}
+  .login-note{font-size:11px;color:var(--muted);margin-top:16px;text-align:center}
+
+  /* ── APP SHELL ── */
+  #app{display:none;min-height:100vh}
+  #app.on{display:grid;grid-template-columns:230px 1fr;grid-template-rows:auto 1fr}
+  .topbar{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:12px;height:58px;padding:0 16px;background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:30}
+  .topbar .brand{display:flex;align-items:center;gap:9px;font-weight:800;letter-spacing:-.03em}
+  .topbar .brand small{font-weight:500;font-size:10.5px;color:var(--muted)}
+  .hamb{display:none;background:transparent;border:1px solid var(--line);border-radius:9px;padding:6px 9px;color:var(--text)}
+  .top-actions{display:flex;align-items:center;gap:8px}
+  .badge-role{font-size:11.5px;font-weight:650;color:var(--brand);background:var(--brand-soft);padding:5px 10px;border-radius:999px;white-space:nowrap}
+  .tbtn{font-size:12.5px;font-weight:600;color:var(--text);background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:6px 11px}
+  .tbtn:hover{border-color:var(--brand)}
+
+  .side{background:var(--surface);border-right:1px solid var(--line);padding:12px 10px;overflow-y:auto}
+  .side .grp{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);padding:12px 10px 4px;display:flex;gap:6px;align-items:center}
+  .side a{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:9px;font-size:13.5px;color:var(--text);text-decoration:none;font-weight:500}
+  .side a .ico{font-size:14px}
+  .side a .tag{margin-left:auto;font-size:8.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+  .side a:hover{background:var(--surface-2)}
+  .side a.active{background:var(--brand-soft);color:var(--brand);font-weight:650}
+
+  .screen{padding:22px;overflow-x:auto}
+  @media (max-width:820px){
+    #app.on{grid-template-columns:1fr}
+    .hamb{display:inline-flex}
+    .side{position:fixed;top:58px;bottom:0;left:0;width:250px;z-index:40;transform:translateX(-105%);transition:transform .22s;box-shadow:var(--shadow)}
+    body.menu .side{transform:none}
+    .badge-role{display:none}
+    .scrim{display:none;position:fixed;inset:58px 0 0 0;background:rgba(0,0,0,.35);z-index:35}
+    body.menu .scrim{display:block}
+  }
+  @media (min-width:821px){.scrim{display:none}}
+
+  /* generic UI */
+  .h-row{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:10px;margin-bottom:16px}
+  h1.title{font-size:20px;font-weight:800}
+  .subt{font-size:13px;color:var(--muted);margin-top:3px}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:14px}
+  .pad{padding:15px 16px}
+  .grid{display:grid;gap:12px}
+  .g4{grid-template-columns:repeat(4,1fr)}.g3{grid-template-columns:repeat(3,1fr)}.g2{grid-template-columns:repeat(2,1fr)}
+  @media (max-width:860px){.g4{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:1fr}.g2{grid-template-columns:1fr}}
+  .kpi{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px}
+  .kpi .l{font-size:11.5px;color:var(--muted)}
+  .kpi .v{font-size:24px;font-weight:800;margin-top:3px;letter-spacing:-.03em}
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  thead td{font-size:11px;color:var(--muted);font-weight:600;background:var(--surface-2)}
+  td{padding:9px 12px;border-bottom:1px solid var(--line);text-align:left}
+  tbody tr:last-child td{border-bottom:0}
+  .chip{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:650;padding:2px 8px;border-radius:999px}
+  .ok{background:var(--good-bg);color:var(--good)}.wn{background:var(--warn-bg);color:var(--warn)}.bd{background:var(--bad-bg);color:var(--bad)}.nt{background:var(--surface-2);color:var(--muted)}
+  .btn{background:var(--brand);color:#fff;border:0;border-radius:9px;padding:8px 13px;font-size:13px;font-weight:600}
+  .btn.ghost{background:var(--surface);color:var(--text);border:1px solid var(--line)}
+  .btn.sm{padding:5px 10px;font-size:12px}
+  .note{background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:12.5px;color:var(--muted)}
+
+  /* area cards (control center) */
+  .area{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px}
+  .area h2{font-size:15px;display:flex;align-items:center;gap:10px;margin-bottom:12px}
+  .area .ai{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;font-size:18px}
+  .mod{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:11px;padding:9px 11px;background:var(--surface);text-align:left;width:100%;margin-top:8px;color:var(--text)}
+  .mod:hover{border-color:var(--brand)}
+  .mod .mi{font-size:15px}.mod .ml{flex:1;font-size:13px;font-weight:600}
+  .tg{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:2px 7px;border-radius:999px}
+  .tg.e{background:var(--good-bg);color:var(--good)}.tg.v{background:var(--surface-2);color:var(--muted)}
+
+  /* bars */
+  .bars{display:flex;align-items:flex-end;gap:10px;height:140px;margin-top:12px}
+  .bars .col{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;justify-content:flex-end;height:100%}
+  .bars .bb{display:flex;align-items:flex-end;gap:3px;height:100%}
+  .bars i{width:12px;border-radius:3px 3px 0 0}
+  .bars .inc{background:var(--brand)}.bars .exp{background:color-mix(in srgb,var(--muted) 45%,transparent)}
+  .bars .cl{font-size:10px;color:var(--muted)}
+  .track{height:7px;border-radius:999px;background:var(--surface-2);overflow:hidden}.track i{display:block;height:100%;border-radius:999px}
+
+  /* kanban */
+  .kb{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  @media (max-width:860px){.kb{grid-template-columns:1fr}}
+  .kcol{background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:10px}
+  .kcol h3{font-size:12.5px;color:var(--muted);padding:2px 4px 8px;display:flex;justify-content:space-between}
+  .kcard{background:var(--surface);border:1px solid var(--line);border-radius:9px;padding:10px;margin-bottom:8px}
+  .kcard .kt{font-size:13px;font-weight:600}
+  .kcard .km{font-size:11px;color:var(--muted);margin-top:3px}
+
+  .fade{animation:f .35s ease}@keyframes f{from{opacity:0;transform:translateY(6px)}to{opacity:1}}
+  :focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+</style>
+
+<!-- LOGIN -->
+<div id="login">
+  <div class="login-card">
+    <div class="brand"><span class="glyph"></span> <span>Cancha <small>gestión deportiva</small></span></div>
+    <p class="login-sub">Prototipo navegable · <b>Sky Sports Chile</b>. Elige con qué área quieres entrar — verás y editarás solo lo que le corresponde.</p>
+    <div class="role-grid" id="roleGrid"></div>
+    <p class="login-note">Demostración · datos de ejemplo · sin claves reales</p>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:10px">
+      <button class="hamb" onclick="document.body.classList.toggle('menu')">☰</button>
+      <div class="brand"><span class="glyph"></span> <span>Cancha</span></div>
+    </div>
+    <div class="top-actions">
+      <span class="badge-role" id="roleBadge"></span>
+      <button class="tbtn" onclick="toggleTheme()">Tema</button>
+      <button class="tbtn" onclick="logout()">Cambiar rol</button>
+    </div>
+  </div>
+  <aside class="side" id="side"></aside>
+  <div class="scrim" onclick="document.body.classList.remove('menu')"></div>
+  <main class="screen" id="screen"></main>
+</div>
+
+<script>
+/* ────────── DATOS DE EJEMPLO ────────── */
+const DATA = {
+  kpis:{socios:294,ingresos:"$13,2M",morosidad:"12%",cobrar:"$2,8M"},
+  bars:[["feb",52,44],["mar",58,47],["abr",63,49],["may",71,52],["jun",84,55],["jul",96,58]],
+  socios:[
+    ["Amanda Pérez","Infantil","Plan Infantil","ok"],["Benjamín Castro","Infantil","Plan Infantil","ok"],
+    ["Colomba Díaz","Infantil","Plan Infantil","bd"],["Emilia Flores","Juvenil","Plan Juvenil","ok"],
+    ["Gaspar Herrera","Juvenil","Plan Juvenil","bd"],["Isidora Ibáñez","Juvenil","Plan Juvenil","ok"],
+    ["Joaquín Jara","Juvenil","Plan Juvenil","wn"],["Katalina Lagos","Competitivo","Plan Competitivo","ok"],
+    ["Lucas Morales","Competitivo","Plan Competitivo","ok"],["Maite Núñez","Competitivo","Plan Competitivo","bd"],
+    ["Nicolás Ortega","Competitivo","Plan Competitivo","ok"],["Olivia Paredes","Competitivo","Plan Competitivo","ok"]
+  ],
+  segmentos:[
+    ["Membresías","CC-100",8940,0],["Trajes","CC-210",1290,940],["Clínica USA","CC-220",1600,1180],
+    ["Campeonatos","CC-230",2100,1650],["Tienda","CC-200",336,320],["Administración","CC-900",0,1740],
+    ["Operación La Serena","CC-610",0,850],["Operación Santiago","CC-620",0,1100]
+  ],
+  equipos:[
+    {n:"All Star Elite",cat:"Competitivo",sede:"La Serena",coach:"Catalina Rojas",roster:["Katalina Lagos (Capitana)","Lucas Morales","Maite Núñez","Nicolás Ortega","Olivia Paredes"]},
+    {n:"Juvenil Stars",cat:"Juvenil",sede:"Santiago",coach:"Matías Fuentes",roster:["Emilia Flores (Capitana)","Gaspar Herrera","Isidora Ibáñez","Joaquín Jara"]}
+  ],
+  comunicados:[
+    ["Inicio temporada competitiva 2026","Este lunes comienzan los entrenamientos del programa competitivo.","Socios"],
+    ["Reunión de apoderados — La Serena","Convocatoria el sábado 10:00 en la sede La Serena.","Socios"],
+    ["Cierre de mes — recordatorio","Enviar rendiciones antes del día 30.","Interno"]
+  ],
+  marketing:[
+    ["Reel: rutina All Star Elite","Instagram","IDEA"],["YouTube: entrevista entrenadora","YouTube","IDEA"],
+    ["TikTok: detrás de cámara clínica","TikTok","PLANIFICADO"],["Post: convocatoria clase prueba","Instagram","PRODUCCION"],
+    ["Reel: resumen campeonato regional","Instagram","PUBLICADO"]
+  ],
+  competencias:[
+    ["Campeonato Regional Norte 2026","1° lugar categoría competitivo","01-07-2026 · La Serena"],
+    ["Copa Nacional Cheer 2026","Por disputar","20-08-2026 · Santiago"]
+  ],
+  certificaciones:[
+    ["Entrenador nivel 2 — Cheerleading","Catalina Rojas · Federación Chilena"],
+    ["Certificación de seguridad y stunts","Catalina Rojas · USA All Star"]
+  ],
+  documentos:[
+    ["Reglamento interno 2026","Reglamentos"],["Protocolo de seguridad y lesiones","Protocolos"],
+    ["Calendario de competencias 2026","Calendarios"]
+  ],
+  traza:[
+    ["Administración","CREAR","Comunicados","Publicó 'Inicio temporada 2026'","hoy 14:55"],
+    ["Marketing","EDITAR","Marketing","'Post convocatoria' → PRODUCCION","hoy 14:50"],
+    ["Finanzas","REGISTRAR","Pagos","Registró pago de membresía","ayer 18:20"],
+    ["Cuerpo deportivo","CREAR","Competencias","Registró 'Campeonato Regional'","ayer 10:05"]
+  ]
+};
+
+/* ────────── ÁREAS Y PERMISOS ────────── */
+const ROLES={
+  ADMIN:{label:"Administración",icon:"🛠️",desc:"Edita y administra todo"},
+  GERENCIA:{label:"Gerencia",icon:"🧭",desc:"Ve todo · genera informes"},
+  FINANZAS:{label:"Finanzas",icon:"💰",desc:"Pagos, cargos y socios"},
+  ADMISION:{label:"Admisión",icon:"🎫",desc:"Comunicados y documentos"},
+  MARKETING:{label:"Marketing",icon:"🎬",desc:"Planifica contenidos"},
+  TECNICO:{label:"Cuerpo deportivo",icon:"🤸",desc:"Competencias y asistencia"},
+  SOCIO:{label:"Socio (app)",icon:"📱",desc:"Vista del atleta/apoderado"}
+};
+// permisos: e=editar, v=ver, ausente=oculto
+const P={
+  ADMIN:{dashboard:"e",socios:"e",segmentos:"e",equipos:"e",comunicados:"e",marketing:"e",competencias:"e",documentos:"e",informes:"e",trazabilidad:"v",guia:"v"},
+  GERENCIA:{dashboard:"v",socios:"v",segmentos:"v",equipos:"v",comunicados:"v",marketing:"v",competencias:"v",documentos:"e",informes:"e",trazabilidad:"v",guia:"v"},
+  FINANZAS:{dashboard:"v",socios:"e",segmentos:"e",informes:"e",guia:"v"},
+  ADMISION:{dashboard:"v",socios:"e",comunicados:"e",documentos:"e",guia:"v"},
+  MARKETING:{dashboard:"v",marketing:"e",comunicados:"v",competencias:"v",documentos:"v",guia:"v"},
+  TECNICO:{dashboard:"v",equipos:"e",competencias:"e",socios:"v",guia:"v"}
+};
+const GROUPS=[
+  {k:"Dirección",icon:"🧭",accent:"#2E5BFF",mods:[["dashboard","📊","Panel general"],["informes","📄","Informes"],["trazabilidad","🧾","Trazabilidad"]]},
+  {k:"Finanzas",icon:"💰",accent:"#0E9F6E",mods:[["segmentos","🧩","Segmentos y finanzas"]]},
+  {k:"Admisión y socios",icon:"🎫",accent:"#C77A05",mods:[["socios","👥","Socios / atletas"],["comunicados","📣","Comunicados"],["documentos","🗂️","Documentos"]]},
+  {k:"Marketing",icon:"🎬",accent:"#D6336C",mods:[["marketing","🗓️","Planificación de contenidos"]]},
+  {k:"Cuerpo deportivo",icon:"🤸",accent:"#7048E8",mods:[["equipos","🏆","Equipos"],["competencias","🥇","Competencias y certificaciones"]]}
+];
+const MODLABEL={dashboard:"Panel general",socios:"Socios / atletas",segmentos:"Segmentos y finanzas",equipos:"Equipos",comunicados:"Comunicados",marketing:"Planificación de contenidos",competencias:"Competencias y certificaciones",documentos:"Documentos",informes:"Informes",trazabilidad:"Trazabilidad",guia:"Guía"};
+
+let STATE={role:null,screen:"home"};
+const perm=(m)=>STATE.role==="SOCIO"?"none":(P[STATE.role]||{})[m]||"none";
+const clp=(mm)=>"$"+mm.toLocaleString("es-CL")+"k";
+
+/* ────────── LOGIN ────────── */
+function renderRoles(){
+  const g=document.getElementById("roleGrid");
+  g.innerHTML=Object.keys(ROLES).map(r=>{
+    const R=ROLES[r];
+    return `<button class="role-btn ${r==="SOCIO"?"socio":""}" onclick="login('${r}')">
+      <span class="rn">${R.icon} ${R.label}</span><span class="rd">${R.desc}</span></button>`;
+  }).join("");
+}
+function login(role){
+  STATE.role=role; STATE.screen=role==="SOCIO"?"socio":"home";
+  document.getElementById("login").style.display="none";
+  document.getElementById("app").classList.add("on");
+  document.getElementById("roleBadge").textContent=ROLES[role].icon+" "+ROLES[role].label;
+  buildSide(); route(STATE.screen);
+}
+function logout(){
+  document.getElementById("app").classList.remove("on");
+  document.body.classList.remove("menu");
+  document.getElementById("login").style.display="grid";
+  window.scrollTo(0,0);
+}
+
+/* ────────── SIDEBAR ────────── */
+function buildSide(){
+  const s=document.getElementById("side");
+  if(STATE.role==="SOCIO"){
+    s.innerHTML=`<div class="grp">📱 App del socio</div>`+
+      [["socio","🏠","Inicio"],["novedades","📣","Novedades"],["qr","🔳","Mi QR"]].map(m=>navA(m)).join("");
+    return;
+  }
+  let html="";
+  GROUPS.forEach(G=>{
+    const mods=G.mods.filter(m=>perm(m[0])!=="none");
+    if(!mods.length)return;
+    html+=`<div class="grp"><span>${G.icon}</span> ${G.k}</div>`+mods.map(m=>navA(m)).join("");
+  });
+  html+=`<div class="grp">❓ Ayuda</div>`+navA(["guia","📘","Guía de uso"]);
+  s.innerHTML=html;
+}
+function navA(m){
+  const id=m[0],ic=m[1],lb=m[2];
+  const pv=STATE.role==="SOCIO"?"":perm(id);
+  const tag=pv==="e"?`<span class="tag">editar</span>`:pv==="v"?`<span class="tag">ver</span>`:"";
+  return `<a href="#" onclick="go('${id}');return false" data-m="${id}"><span class="ico">${ic}</span> ${lb} ${tag}</a>`;
+}
+function go(scr){STATE.screen=scr;document.body.classList.remove("menu");route(scr);}
+
+/* ────────── ROUTER ────────── */
+function route(scr){
+  document.querySelectorAll("#side a").forEach(a=>a.classList.toggle("active",a.dataset.m===scr));
+  const el=document.getElementById("screen");
+  el.classList.remove("fade");void el.offsetWidth;el.classList.add("fade");
+  const R={home:scrHome,dashboard:scrDash,socios:scrSocios,segmentos:scrSeg,equipos:scrEquipos,
+    comunicados:scrCom,marketing:scrMkt,competencias:scrComp,documentos:scrDoc,informes:scrInf,
+    trazabilidad:scrTraza,guia:scrGuia,socio:scrSocioHome,novedades:scrNov,qr:scrQR};
+  el.innerHTML=(R[scr]||scrHome)();
+}
+
+/* ────────── PANTALLAS ADMIN ────────── */
+function head(t,s){return `<div class="h-row"><div><h1 class="title">${t}</h1>${s?`<p class="subt">${s}</p>`:""}</div></div>`}
+function canE(m){return perm(m)==="e"}
+
+function scrHome(){
+  const kp=[["Socios activos",DATA.kpis.socios,"socios"],["Ingresos del mes",DATA.kpis.ingresos,"segmentos"],["Morosidad",DATA.kpis.morosidad,"socios"],["Por cobrar",DATA.kpis.cobrar,"segmentos"]]
+    .filter(k=>perm(k[2])!=="none");
+  let cards="";
+  GROUPS.forEach(G=>{
+    const mods=G.mods.filter(m=>perm(m[0])!=="none");if(!mods.length)return;
+    cards+=`<div class="area"><h2><span class="ai" style="background:${G.accent}1a;color:${G.accent}">${G.icon}</span> ${G.k}</h2>`+
+      mods.map(m=>{const e=perm(m[0])==="e";
+        return `<button class="mod" onclick="go('${m[0]}')"><span class="mi">${m[1]}</span><span class="ml">${m[2]}</span><span class="tg ${e?"e":"v"}">${e?"editar":"ver"}</span></button>`}).join("")+`</div>`;
+  });
+  return `${head("Hola 👋 — "+ROLES[STATE.role].label,"Este es tu centro de control. Ves y editas solo lo de tu área.")}
+    ${kp.length?`<div class="grid g4" style="margin-bottom:18px">${kp.map(k=>`<div class="kpi"><div class="l">${k[0]}</div><div class="v num">${k[1]}</div></div>`).join("")}</div>`:""}
+    <div class="grid g2">${cards}</div>`;
+}
+
+function scrDash(){
+  const mx=Math.max(...DATA.bars.flatMap(b=>[b[1],b[2]]));
+  const bars=DATA.bars.map(b=>`<div class="col"><div class="bb"><i class="inc" style="height:${b[1]/mx*100}%"></i><i class="exp" style="height:${b[2]/mx*100}%"></i></div><span class="cl">${b[0]}</span></div>`).join("");
+  const cats=[["Infantil",3],["Juvenil",4],["Competitivo",5]];
+  return head("Panel general","Datos de demostración · últimos 30 días")+
+    `<div class="grid g4" style="margin-bottom:14px">
+      <div class="kpi"><div class="l">Socios activos</div><div class="v num">294</div></div>
+      <div class="kpi"><div class="l">Ingresos del mes</div><div class="v num">$13,2M</div></div>
+      <div class="kpi"><div class="l">Morosidad</div><div class="v num">12%</div></div>
+      <div class="kpi"><div class="l">Ocupación clases</div><div class="v num">78%</div></div></div>
+    <div class="grid g2">
+      <div class="card pad"><h3 style="font-size:13.5px">Ingresos vs. gastos (6 meses)</h3><div class="bars">${bars}</div>
+        <div style="display:flex;gap:16px;margin-top:10px;font-size:11.5px;color:var(--muted)"><span>▮ Ingresos</span><span style="opacity:.6">▮ Gastos</span></div></div>
+      <div class="card pad"><h3 style="font-size:13.5px;margin-bottom:12px">Atletas por categoría</h3>
+        ${cats.map(c=>`<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px"><span>${c[0]}</span><span class="num" style="color:var(--muted)">${c[1]*20+40}</span></div><div class="track"><i style="width:${c[1]*18}%;background:var(--brand)"></i></div></div>`).join("")}</div>
+    </div>`;
+}
+
+function scrSocios(){
+  const e=canE("socios");
+  const rows=DATA.socios.map(s=>{const st={ok:["ok","Al día"],wn:["wn","Pendiente"],bd:["bd","Moroso"]}[s[3]];
+    return `<tr><td style="font-weight:600">${s[0]}</td><td>${s[1]}</td><td>${s[2]}</td><td><span class="chip ${st[0]}">${st[1]}</span></td>
+    <td style="text-align:right">${e?`<button class="btn sm ghost" onclick="demo('Editar ficha de ${s[0]}')">Editar</button>`:`<span class="chip nt">solo lectura</span>`}</td></tr>`}).join("");
+  return head("Socios / atletas","La base que alimenta todo el sistema")+
+    (e?`<div style="margin-bottom:12px"><button class="btn" onclick="demo('Formulario: registrar nuevo socio')">+ Registrar socio</button></div>`:"")+
+    `<div class="card" style="overflow:hidden"><table><thead><tr><td>Atleta</td><td>Categoría</td><td>Plan</td><td>Estado de pago</td><td></td></tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+
+function scrSeg(){
+  const e=canE("segmentos");
+  const rows=DATA.segmentos.map(s=>{const res=s[2]-s[3];
+    return `<tr><td style="font-weight:600">${s[0]}<div style="font-size:11px;color:var(--muted)">${s[1]}</div></td>
+    <td style="text-align:right;color:var(--good)">${clp(s[2])}</td><td style="text-align:right;color:var(--bad)">${clp(s[3])}</td>
+    <td style="text-align:right;font-weight:700;${res<0?'color:var(--bad)':''}">${clp(res)}</td>
+    <td style="text-align:right">${e?`<button class="btn sm ghost" onclick="demo('Nuevo cargo / movimiento en ${s[0]}')">Cargo</button>`:""}</td></tr>`}).join("");
+  const ti=DATA.segmentos.reduce((a,s)=>a+s[2],0),tg=DATA.segmentos.reduce((a,s)=>a+s[3],0);
+  return head("Segmentos y finanzas","Cada segmento comercial es un centro de costos")+
+    `<div class="grid g3" style="margin-bottom:14px">
+      <div class="kpi"><div class="l">Ingresos período</div><div class="v num" style="color:var(--good)">${clp(ti)}</div></div>
+      <div class="kpi"><div class="l">Gastos período</div><div class="v num" style="color:var(--bad)">${clp(tg)}</div></div>
+      <div class="kpi"><div class="l">Resultado</div><div class="v num">${clp(ti-tg)}</div></div></div>
+    <div class="card" style="overflow:hidden"><table><thead><tr><td>Segmento / centro de costos</td><td style="text-align:right">Ingresos</td><td style="text-align:right">Gastos</td><td style="text-align:right">Resultado</td><td></td></tr></thead><tbody>${rows}</tbody></table></div>
+    <p class="note" style="margin-top:12px">Segmentos del programa competitivo: Membresías, Trajes, Clínica, Campeonatos, Tienda — más Administración y Operación por sede. ${e?"":"Tu área ve estos datos en modo lectura."}</p>`;
+}
+
+function scrEquipos(){
+  const e=canE("equipos");
+  return head("Equipos","Se arman desde la base de socios")+
+    `<div class="grid g2">${DATA.equipos.map(t=>`<div class="card pad">
+      <div style="display:flex;justify-content:space-between;align-items:start"><h3 style="font-size:15px">${t.n}</h3>${e?`<button class="btn sm ghost" onclick="demo('Tomar asistencia de ${t.n}')">Asistencia</button>`:""}</div>
+      <p class="subt">${t.cat} · ${t.sede} · ${t.coach}</p>
+      <div style="margin-top:10px;border-top:1px solid var(--line);padding-top:10px">${t.roster.map(r=>`<div style="font-size:13px;padding:3px 0">• ${r}</div>`).join("")}</div>
+      ${e?`<button class="btn sm" style="margin-top:10px" onclick="demo('Agregar atleta a ${t.n}')">+ Agregar atleta</button>`:""}
+    </div>`).join("")}</div>`;
+}
+
+function scrCom(){
+  const e=canE("comunicados");
+  return head("Comunicados","Los marcados para socios aparecen en la app del socio")+
+    (e?`<div style="margin-bottom:12px"><button class="btn" onclick="demo('Publicar nuevo comunicado')">+ Nuevo comunicado</button></div>`:"")+
+    DATA.comunicados.map(c=>`<div class="card pad" style="margin-bottom:10px"><div style="display:flex;gap:8px;align-items:center"><h3 style="font-size:14.5px">${c[0]}</h3><span class="chip ${c[2]==="Socios"?"ok":"nt"}">${c[2]}</span></div><p style="font-size:13px;color:var(--muted);margin-top:5px">${c[1]}</p></div>`).join("");
+}
+
+let MKT=DATA.marketing.map(m=>m.slice());
+function scrMkt(){
+  const e=canE("marketing"),cols=[["IDEA","Ideas"],["PLANIFICADO","Planificado"],["PRODUCCION","En producción"],["PUBLICADO","Publicado"]];
+  const nx={IDEA:"PLANIFICADO",PLANIFICADO:"PRODUCCION",PRODUCCION:"PUBLICADO",PUBLICADO:null};
+  const ico={Instagram:"📷",TikTok:"🎵",Facebook:"👍",YouTube:"▶️"};
+  return head("Planificación de contenidos","Reels y posts por estado — cada avance queda en trazabilidad")+
+    (e?`<div style="margin-bottom:12px"><button class="btn" onclick="demo('Agregar idea de contenido')">+ Agregar idea</button></div>`:"")+
+    `<div class="kb">${cols.map(c=>{const cards=MKT.map((m,i)=>[m,i]).filter(x=>x[0][2]===c[0]);
+      return `<div class="kcol"><h3><span>${c[1]}</span><span>${cards.length}</span></h3>${cards.map(x=>`<div class="kcard"><div class="kt">${ico[x[0][1]]||"•"} ${x[0][0]}</div><div class="km">${x[0][1]}</div>${e&&nx[c[0]]?`<button class="btn sm" style="margin-top:7px" onclick="mktAdv(${x[1]})">Avanzar →</button>`:""}</div>`).join("")||`<div style="font-size:11px;color:var(--muted);padding:6px 4px">Vacío</div>`}</div>`}).join("")}</div>`;
+}
+function mktAdv(i){const nx={IDEA:"PLANIFICADO",PLANIFICADO:"PRODUCCION",PRODUCCION:"PUBLICADO"};MKT[i][2]=nx[MKT[i][2]]||MKT[i][2];route("marketing");}
+
+function scrComp(){
+  const e=canE("competencias");
+  return head("Competencias y certificaciones","Lo visible aparece en los logros del socio")+
+    `<div class="grid g2"><div>${(e?`<button class="btn sm" style="margin-bottom:10px" onclick="demo('Registrar competencia')">+ Competencia</button>`:"")}
+      ${DATA.competencias.map(c=>`<div class="card pad" style="margin-bottom:10px"><h3 style="font-size:14px">🥇 ${c[0]}</h3><p style="font-size:13px;color:var(--muted)">${c[1]}</p><p style="font-size:11px;color:var(--muted);margin-top:4px">${c[2]}</p></div>`).join("")}</div>
+    <div>${(e?`<button class="btn sm ghost" style="margin-bottom:10px" onclick="demo('Registrar certificación')">+ Certificación</button>`:"")}
+      ${DATA.certificaciones.map(c=>`<div class="card pad" style="margin-bottom:10px"><h3 style="font-size:14px">📜 ${c[0]}</h3><p style="font-size:12px;color:var(--muted);margin-top:3px">${c[1]}</p></div>`).join("")}</div></div>`;
+}
+
+function scrDoc(){
+  const e=canE("documentos");
+  return head("Documentos del club","Descargables y transparentes para socios")+
+    (e?`<div style="margin-bottom:12px"><button class="btn" onclick="demo('Agregar documento (enlace Drive/PDF)')">+ Agregar documento</button></div>`:"")+
+    `<div class="card" style="overflow:hidden"><table><tbody>${DATA.documentos.map(d=>`<tr><td>🗂️ ${d[0]}<div style="font-size:11px;color:var(--muted)">${d[1]}</div></td><td style="text-align:right"><button class="btn sm ghost" onclick="demo('Descargar ${d[0]}')">Descargar</button></td></tr>`).join("")}</tbody></table></div>`;
+}
+
+function scrInf(){
+  const infs=["Base de socios / atletas","Pagos","Movimientos financieros","Resultados por equipo","Cuentas por cobrar","Registro de accesos"];
+  return head("Informes","Exportaciones en CSV para Excel")+
+    `<div class="grid g3">${infs.map(i=>`<div class="card pad"><h3 style="font-size:14px">${i}</h3><button class="btn sm" style="margin-top:10px" onclick="demo('Descargar informe: ${i}')">Descargar CSV</button></div>`).join("")}</div>`;
+}
+
+function scrTraza(){
+  const bg={CREAR:"ok",EDITAR:"nt",ELIMINAR:"bd",REGISTRAR:"wn"};
+  return head("Trazabilidad","Quién hizo qué y cuándo")+
+    `<div class="card" style="overflow:hidden"><table><thead><tr><td>Usuario / área</td><td>Acción</td><td>Módulo</td><td>Detalle</td><td>Fecha</td></tr></thead>
+    <tbody>${DATA.traza.map(t=>`<tr><td style="font-weight:600">${t[0]}</td><td><span class="chip ${bg[t[1]]}">${t[1]}</span></td><td>${t[2]}</td><td style="color:var(--muted)">${t[3]}</td><td style="color:var(--muted)">${t[4]}</td></tr>`).join("")}</tbody></table></div>`;
+}
+
+function scrGuia(){
+  const pasos=[["💰 Finanzas","Registrar socio → cobrar por segmento (Trajes, Campeonatos…) → abonar pagos → exportar resultados."],
+    ["🎫 Admisión","Publicar comunicados (marca 'Socios') y subir documentos con enlace de Drive."],
+    ["🎬 Marketing","Agregar idea de reel y avanzarla por Planificado → Producción → Publicado."],
+    ["🤸 Cuerpo deportivo","Tomar asistencia por equipo y registrar competencias visibles a socios."],
+    ["🧭 Gerencia","Ver todo, exportar informes y auditar en Trazabilidad."]];
+  return head("Guía: cómo ingresar los datos","Cada área ve solo sus pasos")+
+    pasos.map((p,i)=>`<div class="card pad" style="margin-bottom:10px"><h3 style="font-size:14.5px">${p[0]}</h3><p style="font-size:13px;color:var(--muted);margin-top:4px">${p[1]}</p></div>`).join("")+
+    `<p class="note">Gerencia y Administración ven todo; cada área edita solo lo suyo. Todo cambio queda en Trazabilidad.</p>`;
+}
+
+/* ────────── VISTA SOCIO ────────── */
+function scrSocioHome(){
+  return head("Hola, Amanda 👋","Sky Sports Chile · La Serena")+
+    `<div class="card pad" style="margin-bottom:12px"><h3 style="font-size:13.5px">Mi plan</h3><p style="font-size:19px;font-weight:800;margin-top:4px">Plan Infantil</p><p class="subt">$35.000 / mes · La Serena</p></div>
+     <div class="card pad" style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:13.5px">Estado de pago</span><span class="chip ok">Al día</span></div></div>
+     <div class="card pad"><h3 style="font-size:13.5px;margin-bottom:8px">Próxima clase</h3><p style="font-size:13.5px;font-weight:600">Cheer Infantil</p><p class="subt">Lunes 17:00 · La Serena</p></div>`;
+}
+function scrNov(){
+  return head("Novedades del club")+
+    `<h3 style="font-size:13px;color:var(--muted);margin:4px 0 8px">📣 Comunicados</h3>${DATA.comunicados.filter(c=>c[2]==="Socios").map(c=>`<div class="card pad" style="margin-bottom:8px"><b style="font-size:14px">${c[0]}</b><p style="font-size:13px;color:var(--muted);margin-top:4px">${c[1]}</p></div>`).join("")}
+     <h3 style="font-size:13px;color:var(--muted);margin:16px 0 8px">🥇 Logros</h3>${DATA.competencias.map(c=>`<div class="card pad" style="margin-bottom:8px"><b style="font-size:14px">${c[0]}</b><p style="font-size:12.5px;color:var(--muted)">${c[1]} · ${c[2]}</p></div>`).join("")}
+     <h3 style="font-size:13px;color:var(--muted);margin:16px 0 8px">🗂️ Documentos</h3><div class="card" style="overflow:hidden"><table><tbody>${DATA.documentos.map(d=>`<tr><td>${d[0]}</td><td style="text-align:right"><button class="btn sm ghost" onclick="demo('Descargar ${d[0]}')">Descargar</button></td></tr>`).join("")}</tbody></table></div>`;
+}
+function scrQR(){
+  return head("Mi código de acceso")+
+    `<div class="card pad" style="text-align:center;max-width:320px;margin:0 auto">
+      <div style="width:180px;height:180px;margin:8px auto;background:
+        repeating-linear-gradient(0deg,var(--text) 0 8px,transparent 8px 16px),
+        repeating-linear-gradient(90deg,var(--text) 0 8px,transparent 8px 16px);
+        background-blend-mode:multiply;border-radius:8px;opacity:.85"></div>
+      <p style="font-weight:700;margin-top:10px">Amanda Pérez</p><span class="chip ok">Al día</span>
+      <p class="subt" style="margin-top:8px">Muestra este código en recepción al ingresar.</p></div>`;
+}
+
+/* ────────── UTILS ────────── */
+function demo(msg){alert("Prototipo de demostración\n\n"+msg+"\n\nEn el sistema real este botón guarda en la base de datos.");}
+function toggleTheme(){const r=document.documentElement;let c=r.getAttribute("data-theme");if(!c)c=matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light";r.setAttribute("data-theme",c==="dark"?"light":"dark");}
+renderRoles();
+</script>
+<script>
+/* Manifest en línea para "agregar a inicio" en Android/Chrome */
+(function(){try{
+  var m={name:"Cancha — Sky Sports",short_name:"Cancha",start_url:".",display:"standalone",
+    background_color:"#080D18",theme_color:"#0C1524",
+    icons:[{src:"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='42' fill='%230C1524'/%3E%3Cpath d='M52 126 82 78l24 28 17-40 9 58' fill='none' stroke='%235A82FF' stroke-width='12' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E",sizes:"192x192 512x512",type:"image/svg+xml",purpose:"any"}]};
+  var b=new Blob([JSON.stringify(m)],{type:"application/manifest+json"});
+  var l=document.createElement("link");l.rel="manifest";l.href=URL.createObjectURL(b);document.head.appendChild(l);
+}catch(e){}})();
+</script>
+</body>
+</html>
