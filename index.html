@@ -3,36 +3,51 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#080A16">
+<meta name="theme-color" content="#6D5EFF">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Cancha">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Crect width='96' height='96' rx='22' fill='%236D5EFF'/%3E%3Cpath d='M26 62 40 40l12 14 8-20 4 28' fill='none' stroke='%23fff' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
-<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%236D5EFF'/%3E%3Cpath d='M48 118 76 74l22 26 16-38 8 54' fill='none' stroke='%23fff' stroke-width='11' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<meta name="apple-mobile-web-app-title" content="Hit Zero">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Crect width='96' height='96' rx='22' fill='%236D5EFF'/%3E%3Ctext x='48' y='62' font-family='Arial' font-size='42' font-weight='bold' fill='white' text-anchor='middle'%3EHZ%3C/text%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%236D5EFF'/%3E%3Ctext x='90' y='118' font-family='Arial' font-size='80' font-weight='bold' fill='white' text-anchor='middle'%3EHZ%3C/text%3E%3C/svg%3E">
 </head>
 <body>
-<title>Cancha — Plataforma de gestión deportiva</title>
+<title>Hit Zero — Plataforma de gestión para cheerleading</title>
 <style>
   :root{
-    --brand:#6D5EFF;--accent:#FF6B4A;
+    --brand:#6D5EFF;--accent:#FF4D8D;
+    --ground:#F5F6FC;--surface:#FFFFFF;--surface-2:#EEF0F9;--text:#12132A;--muted:#666C88;--line:#E5E7F3;
+    --good:#0E9F6E;--warn:#C77A05;--bad:#E02424;--good-bg:#DEF7EC;--warn-bg:#FDF3D0;--bad-bg:#FDE6E6;
+    --c1:#6D5EFF;--c2:#0EA5A5;--c3:#FF4D8D;--c4:#F59E0B;
+    --shadow:0 1px 2px rgba(20,22,60,.05),0 12px 30px -14px rgba(20,22,60,.18);
+    --brand-soft:color-mix(in srgb,var(--brand) 12%,var(--surface));
+    --brand-tint:color-mix(in srgb,var(--brand) 8%,var(--surface));
+    --grad:linear-gradient(135deg,var(--brand),var(--accent));
+    color-scheme:light;
+  }
+  :root[data-theme="dark"]{
     --ground:#080A16;--surface:#12152A;--surface-2:#1A1E38;--text:#ECEDFB;--muted:#9AA0C4;--line:#272B4C;
     --good:#34D399;--warn:#FBBF24;--bad:#FB7185;--good-bg:#0E2C23;--warn-bg:#2E2607;--bad-bg:#2E1218;
     --shadow:0 1px 2px rgba(0,0,0,.35),0 22px 46px -22px rgba(0,0,0,.75);
-    --brand-soft:color-mix(in srgb,var(--brand) 22%,var(--surface));
-    --brand-tint:color-mix(in srgb,var(--brand) 14%,var(--surface));
-    --grad:linear-gradient(135deg,var(--brand),color-mix(in srgb,var(--brand) 45%,var(--accent)));
+    --brand-soft:color-mix(in srgb,var(--brand) 24%,var(--surface));
+    --brand-tint:color-mix(in srgb,var(--brand) 15%,var(--surface));
     color-scheme:dark;
   }
+  @media (prefers-color-scheme:dark){:root:not([data-theme]){
+    --ground:#080A16;--surface:#12152A;--surface-2:#1A1E38;--text:#ECEDFB;--muted:#9AA0C4;--line:#272B4C;
+    --good:#34D399;--warn:#FBBF24;--bad:#FB7185;--good-bg:#0E2C23;--warn-bg:#2E2607;--bad-bg:#2E1218;
+    --shadow:0 1px 2px rgba(0,0,0,.35),0 22px 46px -22px rgba(0,0,0,.75);
+    --brand-soft:color-mix(in srgb,var(--brand) 24%,var(--surface));--brand-tint:color-mix(in srgb,var(--brand) 15%,var(--surface));color-scheme:dark;
+  }}
+
   *{box-sizing:border-box}
   body{margin:0;background:var(--ground);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased}
   h1,h2,h3{margin:0;letter-spacing:-.025em;text-wrap:balance}
   .num{font-variant-numeric:tabular-nums}
-  button{font:inherit;cursor:pointer}
-  a{color:inherit}
+  button{font:inherit;cursor:pointer}a{color:inherit}
   ::-webkit-scrollbar{width:9px;height:9px}::-webkit-scrollbar-thumb{background:var(--line);border-radius:9px}
 
-  .logo{width:34px;height:34px;border-radius:10px;flex:none;background:var(--grad);display:grid;place-items:center;color:#fff;font-weight:800;font-size:15px;overflow:hidden}
+  .logo{width:34px;height:34px;border-radius:10px;flex:none;background:var(--grad);display:grid;place-items:center;color:#fff;font-weight:800;font-size:14px;overflow:hidden}
   .logo img{width:100%;height:100%;object-fit:cover}
   .wordmark{font-weight:800;letter-spacing:-.03em}
 
@@ -45,7 +60,7 @@
   .hero h1 .g{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
   .hero p.sub{color:var(--muted);font-size:15.5px;margin:16px auto 0;max-width:42ch}
   .feat{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:20px}
-  .feat span{font-size:12px;font-weight:600;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:7px 12px}
+  .feat span{font-size:12px;font-weight:600;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:7px 12px;box-shadow:var(--shadow)}
   .enter{margin-top:26px;background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:20px}
   .enter h2{font-size:13px;color:var(--muted);font-weight:600;margin-bottom:12px}
   .role-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
@@ -56,57 +71,60 @@
   .role-btn.socio{grid-column:1/-1;background:var(--brand-soft);border-color:transparent}
   .cust-link{margin-top:14px;font-size:12.5px;font-weight:600;color:var(--brand);background:none;border:0}
   .login-foot{font-size:11px;color:var(--muted);margin-top:18px}
+  .tt{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);background:var(--text);color:var(--ground);font-size:13px;font-weight:600;padding:10px 16px;border-radius:999px;opacity:0;transition:.25s;z-index:80;pointer-events:none}
+  .tt.on{opacity:1;transform:translateX(-50%)}
 
   #app{display:none;min-height:100vh}
   #app.on{display:grid;grid-template-columns:236px 1fr;grid-template-rows:auto 1fr}
-  .topbar{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:12px;height:60px;padding:0 16px;background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:30}
-  .topbar .brandrow{display:flex;align-items:center;gap:10px}
-  .topbar .wordmark small{font-size:10px;color:var(--muted);font-weight:500;display:block;margin-top:-2px}
-  .hamb{display:none;background:transparent;border:1px solid var(--line);border-radius:9px;padding:6px 9px;color:var(--text)}
-  .tacts{display:flex;align-items:center;gap:7px}
+  .topbar{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:10px;height:60px;padding:0 14px;background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:30}
+  .topbar .lft{display:flex;align-items:center;gap:8px;min-width:0}
+  .topbar .brandrow{display:flex;align-items:center;gap:9px;min-width:0}
+  .topbar .wordmark{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .topbar .wordmark small{font-size:10px;color:var(--muted);font-weight:500;display:block;margin-top:-2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px}
+  .hamb,.back{display:none;background:transparent;border:1px solid var(--line);border-radius:9px;padding:6px 9px;color:var(--text)}
+  .back.show{display:inline-flex}
+  .tacts{display:flex;align-items:center;gap:6px}
   .rolechip{font-size:11.5px;font-weight:650;color:var(--brand);background:var(--brand-soft);padding:6px 11px;border-radius:999px;white-space:nowrap}
-  .ib{background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:7px 11px;font-size:12.5px;font-weight:600;color:var(--text)}
+  .ib{background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:7px 10px;font-size:12.5px;font-weight:600;color:var(--text)}
   .ib:hover{border-color:var(--brand)}
 
   .side{background:var(--surface);border-right:1px solid var(--line);padding:12px 10px;overflow-y:auto}
   .side .grp{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);padding:12px 10px 4px;display:flex;gap:6px}
   .side a{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:9px;font-size:13.5px;color:var(--text);text-decoration:none;font-weight:500;cursor:pointer}
-  .side a .ico{font-size:14px}
-  .side a .tag{margin-left:auto;font-size:8.5px;font-weight:700;text-transform:uppercase;color:var(--muted)}
-  .side a:hover{background:var(--surface-2)}
-  .side a.active{background:var(--brand-soft);color:var(--brand);font-weight:650}
+  .side a .ico{font-size:14px}.side a .tag{margin-left:auto;font-size:8.5px;font-weight:700;text-transform:uppercase;color:var(--muted)}
+  .side a:hover{background:var(--surface-2)}.side a.active{background:var(--brand-soft);color:var(--brand);font-weight:650}
 
-  .screen{padding:22px;overflow-x:auto}
+  .screen{padding:22px}
   .wrap{max-width:1060px;margin:0 auto}
+  .tw{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:15px}
+  .tw td{white-space:nowrap}
   @media (max-width:860px){
-    #app.on{grid-template-columns:1fr}.hamb{display:inline-flex}
+    #app.on{grid-template-columns:1fr}.hamb{display:inline-flex}.screen{padding:14px}
     .side{position:fixed;top:60px;bottom:0;left:0;width:256px;z-index:40;transform:translateX(-105%);transition:.22s;box-shadow:var(--shadow)}
-    body.menu .side{transform:none}.rolechip{display:none}
-    .scrim{position:fixed;inset:60px 0 0 0;background:rgba(0,0,0,.5);z-index:35;display:none}body.menu .scrim{display:block}
+    body.menu .side{transform:none}.rolechip{display:none}.topbar .wordmark small{max-width:110px}
+    .scrim{position:fixed;inset:60px 0 0 0;background:rgba(0,0,0,.45);z-index:35;display:none}body.menu .scrim{display:block}
   }
   @media (min-width:861px){.scrim{display:none}}
 
-  h1.title{font-size:21px;font-weight:800}
+  h1.title{font-size:20px;font-weight:800}
   .subt{font-size:13px;color:var(--muted);margin-top:3px}
   .h-row{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:10px;margin-bottom:18px}
   .card{background:var(--surface);border:1px solid var(--line);border-radius:15px}
   .pad{padding:16px}
   .grid{display:grid;gap:12px}.g4{grid-template-columns:repeat(4,1fr)}.g3{grid-template-columns:repeat(3,1fr)}.g2{grid-template-columns:repeat(2,1fr)}
   @media (max-width:820px){.g4{grid-template-columns:repeat(2,1fr)}.g3,.g2{grid-template-columns:1fr}}
-  .kpi{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:15px;padding:15px;overflow:hidden}
-  .kpi::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--grad)}
+  .kpi{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:15px;padding:15px 15px 15px 18px;overflow:hidden}
+  .kpi::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--kc,var(--brand))}
   .kpi .l{font-size:11.5px;color:var(--muted)}
-  .kpi .v{font-size:25px;font-weight:800;margin-top:3px;letter-spacing:-.03em}
-  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  .kpi .v{font-size:24px;font-weight:800;margin-top:3px;letter-spacing:-.03em;color:var(--kc,var(--text))}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;min-width:460px}
   thead td{font-size:11px;color:var(--muted);font-weight:600;background:var(--surface-2)}
   td{padding:9px 12px;border-bottom:1px solid var(--line);text-align:left}
   tbody tr:last-child td{border-bottom:0}
   .chip{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:650;padding:2px 8px;border-radius:999px}
   .ok{background:var(--good-bg);color:var(--good)}.wn{background:var(--warn-bg);color:var(--warn)}.bd{background:var(--bad-bg);color:var(--bad)}.nt{background:var(--surface-2);color:var(--muted)}
   .btn{background:var(--brand);color:#fff;border:0;border-radius:10px;padding:9px 14px;font-size:13px;font-weight:650}
-  .btn:hover{filter:brightness(1.08)}
-  .btn.ghost{background:var(--surface);color:var(--text);border:1px solid var(--line)}
-  .btn.sm{padding:6px 11px;font-size:12px}
+  .btn:hover{filter:brightness(1.07)}.btn.ghost{background:var(--surface);color:var(--text);border:1px solid var(--line)}.btn.sm{padding:6px 11px;font-size:12px}
   .note{background:var(--brand-tint);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:12.5px;color:var(--muted)}
   label.fl{display:block;font-size:11.5px;color:var(--muted);margin-bottom:5px;font-weight:600}
   .inp{width:100%;border:1px solid var(--line);background:var(--surface-2);color:var(--text);border-radius:10px;padding:9px 11px;font-size:13.5px}
@@ -117,15 +135,12 @@
   .mod{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:11px;padding:9px 11px;background:var(--surface);text-align:left;width:100%;margin-top:8px;color:var(--text);cursor:pointer;transition:.14s}
   .mod:hover{border-color:var(--brand);transform:translateX(2px)}
   .mod .mi{font-size:15px}.mod .ml{flex:1;font-size:13px;font-weight:600}
-  .tg{font-size:9.5px;font-weight:700;text-transform:uppercase;padding:2px 7px;border-radius:999px}
-  .tg.e{background:var(--good-bg);color:var(--good)}.tg.v{background:var(--surface-2);color:var(--muted)}
+  .tg{font-size:9.5px;font-weight:700;text-transform:uppercase;padding:2px 7px;border-radius:999px}.tg.e{background:var(--good-bg);color:var(--good)}.tg.v{background:var(--surface-2);color:var(--muted)}
 
   .bars{display:flex;align-items:flex-end;gap:10px;height:150px;margin-top:14px}
   .bars .col{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;justify-content:flex-end;height:100%}
   .bars .bb{display:flex;align-items:flex-end;gap:3px;height:100%}
-  .bars i{width:13px;border-radius:4px 4px 0 0}
-  .bars .inc{background:var(--grad)}.bars .exp{background:color-mix(in srgb,var(--muted) 40%,transparent)}
-  .bars .cl{font-size:10px;color:var(--muted)}
+  .bars i{width:13px;border-radius:4px 4px 0 0}.bars .inc{background:var(--grad)}.bars .exp{background:color-mix(in srgb,var(--muted) 40%,transparent)}.bars .cl{font-size:10px;color:var(--muted)}
   .track{height:8px;border-radius:999px;background:var(--surface-2);overflow:hidden}.track i{display:block;height:100%;border-radius:999px}
 
   .kb{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}@media (max-width:860px){.kb{grid-template-columns:1fr}}
@@ -134,28 +149,27 @@
   .kcard{background:var(--surface);border:1px solid var(--line);border-radius:9px;padding:10px;margin-bottom:8px}
   .kcard .kt{font-size:13px;font-weight:600}.kcard .km{font-size:11px;color:var(--muted);margin-top:3px}
 
-  .modal{position:fixed;inset:0;background:rgba(2,3,10,.65);display:none;place-items:center;z-index:60;padding:18px}
+  .modal{position:fixed;inset:0;background:rgba(2,3,10,.6);display:none;place-items:center;z-index:60;padding:18px}
   .modal.on{display:grid}
   .msheet{width:100%;max-width:440px;background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:20px;max-height:90vh;overflow:auto}
   .msheet h2{font-size:17px;font-weight:800;display:flex;align-items:center;gap:9px}
   .prev{margin-top:14px;border:1px solid var(--line);border-radius:12px;padding:14px;background:var(--brand-tint)}
   .selp{border:1px solid var(--line);background:var(--surface-2);color:var(--text);border-radius:8px;padding:6px 8px;font-size:12px}
-
   .fade{animation:f .32s ease}@keyframes f{from{opacity:0;transform:translateY(6px)}to{opacity:1}}
   :focus-visible{outline:2px solid var(--brand);outline-offset:2px}
 </style>
 
 <div id="login">
   <div class="hero">
-    <div class="brandrow"><span class="logo brand-logo">C</span> <span class="wordmark">Cancha <small>gestión deportiva</small></span></div>
-    <div><span class="badge">Piloto · configurable por club</span></div>
-    <h1>La plataforma de tu club, <span class="g">a tu medida</span>.</h1>
-    <p class="sub">Cada club arma lo suyo: centros de costo, informes, competencias y permisos por área. Ponle tu nombre y tu logo y empieza a probar.</p>
-    <div class="feat"><span>👥 Socios y equipos</span><span>💰 Finanzas configurable</span><span>📊 Estado de resultados</span><span>🔐 Permisos por área</span></div>
+    <div class="brandrow"><span class="logo brand-logo">HZ</span> <span class="wordmark">Hit Zero <small>cheer · Chile</small></span></div>
+    <div><span class="badge">Piloto · gestión de cheerleading</span></div>
+    <h1>La plataforma de tu academia de <span class="g">cheer</span>.</h1>
+    <p class="sub">Atletas, equipos, finanzas por centro de costo, competencias y app del socio — hecha para cheerleading. Ponle tu nombre y tu logo y arma lo tuyo.</p>
+    <div class="feat"><span>🤸 Atletas y equipos</span><span>💰 Finanzas por segmento</span><span>🥇 Competencias</span><span>🔐 Permisos por área</span></div>
     <div class="enter">
       <h2>Entrar como…</h2>
       <div class="role-grid" id="roleGrid"></div>
-      <button class="cust-link" onclick="openCust()">🏷️ Personalizar mi club (logo y nombre)</button>
+      <button class="cust-link" onclick="openCust()">🏷️ Personalizar mi academia (logo y nombre)</button>
     </div>
     <p class="login-foot">Demostración · todo editable · tu configuración se guarda en este dispositivo</p>
   </div>
@@ -163,38 +177,39 @@
 
 <div id="app">
   <div class="topbar">
-    <div class="brandrow">
+    <div class="lft">
       <button class="hamb" onclick="document.body.classList.toggle('menu')">☰</button>
-      <span class="logo brand-logo">C</span>
-      <span class="wordmark">Cancha<small class="brand-name">Club Demo</small></span>
+      <button class="back" id="backBtn" onclick="goBack()">←</button>
+      <div class="brandrow"><span class="logo brand-logo">HZ</span><span class="wordmark">Hit Zero<small class="brand-name">Hit Zero Cheer Chile</small></span></div>
     </div>
     <div class="tacts">
       <span class="rolechip" id="roleChip"></span>
       <button class="ib" onclick="openCust()">🏷️</button>
+      <button class="ib" onclick="toggleTheme()" id="thBtn">◐</button>
       <button class="ib" onclick="logout()">Salir</button>
     </div>
   </div>
   <aside class="side" id="side"></aside>
   <div class="scrim" onclick="document.body.classList.remove('menu')"></div>
-  <main class="screen" id="screen"><div class="wrap" id="wrap"></div></main>
+  <main class="screen"><div class="wrap" id="wrap"></div></main>
 </div>
 
-<div class="modal" id="custModal">
-  <div class="msheet">
-    <h2>🏷️ Personalizar club</h2>
-    <p class="subt" style="margin:4px 0 16px">Solo tu nombre y tu logo. Se guarda en este dispositivo.</p>
-    <label class="fl">Nombre del club</label>
-    <input class="inp" id="cName" placeholder="Ej: Sky Sports, Halcones Cheer…" oninput="liveCust()">
-    <label class="fl" style="margin-top:14px">Logo (opcional)</label>
-    <input type="file" id="cLogo" accept="image/*" class="inp" onchange="logoUp(event)">
-    <div class="prev"><div style="display:flex;align-items:center;gap:10px"><span class="logo brand-logo">C</span><b class="brand-name">Club Demo</b></div><p style="font-size:12px;color:var(--muted);margin:8px 0 0">Vista previa de tu marca</p></div>
-    <div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap">
-      <button class="btn" onclick="closeCust()">Aplicar y cerrar</button>
-      <button class="btn ghost" onclick="rmLogo()">Quitar logo</button>
-      <button class="btn ghost" onclick="resetAll()">Restablecer demo</button>
-    </div>
+<div class="modal" id="custModal"><div class="msheet">
+  <h2>🏷️ Personalizar academia</h2>
+  <p class="subt" style="margin:4px 0 16px">Tu nombre y tu logo. Se guarda en este dispositivo.</p>
+  <label class="fl">Nombre de la academia</label>
+  <input class="inp" id="cName" placeholder="Ej: Hit Zero Cheer, Sky Sports…" oninput="liveCust()">
+  <label class="fl" style="margin-top:14px">Logo (opcional)</label>
+  <input type="file" id="cLogo" accept="image/*" class="inp" onchange="logoUp(event)">
+  <div class="prev"><div style="display:flex;align-items:center;gap:10px"><span class="logo brand-logo">HZ</span><b class="brand-name">Hit Zero Cheer Chile</b></div><p style="font-size:12px;color:var(--muted);margin:8px 0 0">Vista previa de tu marca</p></div>
+  <div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap">
+    <button class="btn" onclick="closeCust()">💾 Grabar y cerrar</button>
+    <button class="btn ghost" onclick="rmLogo()">Quitar logo</button>
+    <button class="btn ghost" onclick="resetAll()">Restablecer</button>
   </div>
-</div>
+</div></div>
+
+<div class="tt" id="toast"></div>
 
 <script>
 /* ═════ CONFIG PERSISTENTE ═════ */
@@ -202,175 +217,175 @@ const SEED={
   centros:[["Membresías","CC-100",8940,0],["Trajes","CC-210",1290,940],["Clínica","CC-220",1600,1180],["Campeonatos","CC-230",2100,1650],["Tienda","CC-200",336,320],["Administración","CC-900",0,1740],["Operación La Serena","CC-610",0,850],["Operación Santiago","CC-620",0,1100]],
   gastos:[["18-07","CC-900","Remuneraciones",1740,"Sueldos administración"],["16-07","CC-610","Arriendo",850,"Arriendo sede La Serena"],["16-07","CC-620","Arriendo",1100,"Arriendo sede Santiago"]],
   competencias:[["Campeonato Regional 2026","1° lugar competitivo","01-07 · La Serena"],["Copa Nacional 2026","Por disputar","20-08 · Santiago"]],
-  perms:{}
+  comunicados:[["Inicio de temporada 2026","Este lunes comienzan los entrenamientos del programa competitivo.","Socios",null],["Reunión de apoderados","Convocatoria el sábado 10:00 en la sede principal.","Socios",null],["Cierre de mes","Enviar rendiciones antes del día 30.","Interno",null]]
 };
-const DEF={club:"Club Demo",logo:null,centros:null,gastos:null,competencias:null,perms:null};
+const DEF={club:"Hit Zero Cheer Chile",logo:null,theme:null,centros:null,gastos:null,competencias:null,comunicados:null,perms:null,dash:null};
 let CFG=load();
-function load(){let c;try{c=JSON.parse(localStorage.getItem("cancha_cfg")||"{}")}catch(e){c={}}
+function load(){let c;try{c=JSON.parse(localStorage.getItem("hz_cfg")||"{}")}catch(e){c={}}
   c=Object.assign({},DEF,c);
   if(!c.centros)c.centros=SEED.centros.map(x=>x.slice());
   if(!c.gastos)c.gastos=SEED.gastos.map(x=>x.slice());
   if(!c.competencias)c.competencias=SEED.competencias.map(x=>x.slice());
+  if(!c.comunicados)c.comunicados=SEED.comunicados.map(x=>x.slice());
   if(!c.perms)c.perms={};
+  if(!c.dash)c.dash=["socios","ingresos","morosidad","ocupacion","chart","cats"];
   return c;}
-function save(){try{localStorage.setItem("cancha_cfg",JSON.stringify(CFG))}catch(e){}}
-function resetAll(){localStorage.removeItem("cancha_cfg");CFG=load();applyCfg();closeCust();if(STATE.role){buildSide();route(STATE.screen);}}
+function save(silent){try{localStorage.setItem("hz_cfg",JSON.stringify(CFG));if(!silent)toast("Guardado ✓")}catch(e){alert("No se pudo guardar (archivo muy grande). Prueba un PDF más liviano.")}}
+function resetAll(){localStorage.removeItem("hz_cfg");CFG=load();applyTheme();applyCfg();closeCust();if(STATE.role){buildSide();route(STATE.screen);}}
+function toast(m){const t=document.getElementById("toast");t.textContent=m;t.classList.add("on");clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove("on"),1600);}
 
-function initials(n){return (n||"C").trim().split(/\s+/).slice(0,2).map(w=>w[0]).join("").toUpperCase()||"C"}
+function initials(n){return (n||"HZ").trim().split(/\s+/).slice(0,2).map(w=>w[0]).join("").toUpperCase()||"HZ"}
 function applyCfg(){document.querySelectorAll(".brand-name").forEach(e=>e.textContent=CFG.club);document.querySelectorAll(".brand-logo").forEach(e=>{e.innerHTML=CFG.logo?`<img src="${CFG.logo}" alt="">`:initials(CFG.club);});}
+function applyTheme(){const r=document.documentElement;if(CFG.theme)r.setAttribute("data-theme",CFG.theme);else r.removeAttribute("data-theme");}
+function toggleTheme(){const cur=CFG.theme||(matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light");CFG.theme=cur==="dark"?"light":"dark";applyTheme();save(true);toast(CFG.theme==="dark"?"Modo oscuro":"Modo claro");}
 function openCust(){document.getElementById("cName").value=CFG.club;document.getElementById("custModal").classList.add("on");}
-function liveCust(){CFG.club=document.getElementById("cName").value||"Club Demo";applyCfg();}
+function liveCust(){CFG.club=document.getElementById("cName").value||"Hit Zero Cheer Chile";applyCfg();}
 function logoUp(ev){const f=ev.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{CFG.logo=r.result;applyCfg();};r.readAsDataURL(f);}
 function rmLogo(){CFG.logo=null;document.getElementById("cLogo").value="";applyCfg();}
 function closeCust(){save();document.getElementById("custModal").classList.remove("on");}
 
-/* ═════ DATOS DEMO FIJOS ═════ */
+/* ═════ DATOS DEMO ═════ */
 const DATA={
   bars:[["feb",52,44],["mar",58,47],["abr",63,49],["may",71,52],["jun",84,55],["jul",96,58]],
   socios:[["Amanda Pérez","Infantil","Plan Infantil","ok"],["Benjamín Castro","Infantil","Plan Infantil","ok"],["Colomba Díaz","Infantil","Plan Infantil","bd"],["Emilia Flores","Juvenil","Plan Juvenil","ok"],["Gaspar Herrera","Juvenil","Plan Juvenil","bd"],["Isidora Ibáñez","Juvenil","Plan Juvenil","ok"],["Joaquín Jara","Juvenil","Plan Juvenil","wn"],["Katalina Lagos","Competitivo","Plan Competitivo","ok"],["Lucas Morales","Competitivo","Plan Competitivo","ok"],["Maite Núñez","Competitivo","Plan Competitivo","bd"]],
   cobrar:[["Katalina Lagos","Campeonatos",180,60],["Lucas Morales","Trajes",90,90],["Maite Núñez","Campeonatos",180,0],["Emilia Flores","Clínica",120,40],["Gaspar Herrera","Trajes",90,0]],
   equipos:[{n:"Equipo Elite",cat:"Competitivo",sede:"La Serena",coach:"C. Rojas",roster:["Katalina Lagos (Capitana)","Lucas Morales","Maite Núñez","Nicolás Ortega"]},{n:"Equipo Juvenil",cat:"Juvenil",sede:"Santiago",coach:"M. Fuentes",roster:["Emilia Flores (Capitana)","Gaspar Herrera","Isidora Ibáñez"]}],
-  comunicados:[["Inicio de temporada 2026","Este lunes comienzan los entrenamientos.","Socios"],["Reunión de apoderados","Convocatoria el sábado 10:00.","Socios"],["Cierre de mes","Enviar rendiciones antes del día 30.","Interno"]],
   marketing:[["Reel: rutina Equipo Elite","Instagram","IDEA"],["Entrevista entrenadora","YouTube","IDEA"],["Detrás de cámara clínica","TikTok","PLANIFICADO"],["Convocatoria clase prueba","Instagram","PRODUCCION"],["Resumen campeonato","Instagram","PUBLICADO"]],
   documentos:[["Reglamento interno 2026","Reglamentos"],["Protocolo de seguridad","Protocolos"]],
   traza:[["Administración","REGISTRAR","Gastos","Ingresó gasto de arriendo","hoy 14:55"],["Marketing","EDITAR","Marketing","'Convocatoria' → PRODUCCIÓN","hoy 14:50"],["Finanzas","REGISTRAR","Cuentas por cobrar","Abonó cuota","ayer 18:20"]]
 };
+const GCATS=["Arriendo","Remuneraciones","Implementos","Servicios básicos","Marketing","Transporte","Otros"];
 
 /* ═════ ROLES / MÓDULOS / PERMISOS ═════ */
 const ROLES={ADMIN:{label:"Administración",icon:"🛠️",desc:"Ve y edita todo · permisos"},GERENCIA:{label:"Gerencia",icon:"🧭",desc:"Ve todo · permisos"},FINANZAS:{label:"Finanzas",icon:"💰",desc:"Pagos, gastos y cobros"},ADMISION:{label:"Admisión",icon:"🎫",desc:"Comunicados y socios"},MARKETING:{label:"Marketing",icon:"🎬",desc:"Planifica contenidos"},TECNICO:{label:"Cuerpo deportivo",icon:"🤸",desc:"Equipos y competencias"},SOCIO:{label:"Socio (app)",icon:"📱",desc:"Vista del atleta"}};
-const AREAS_CFG=["FINANZAS","ADMISION","MARKETING","TECNICO"]; // áreas cuyos permisos se editan
+const AREAS_CFG=["FINANZAS","ADMISION","MARKETING","TECNICO"];
 const MODLIST=[["dashboard","📊","Panel general"],["resultados","📈","Estado de resultados"],["socios","👥","Socios / atletas"],["segmentos","🧩","Centros de costo"],["gastos","🧾","Gastos"],["cobrar","📥","Cuentas por cobrar"],["equipos","🏆","Equipos"],["competencias","🥇","Competencias"],["comunicados","📣","Comunicados"],["marketing","🗓️","Planificación"],["documentos","🗂️","Documentos"],["informes","📄","Informes"]];
 const GROUPS=[
   {k:"Dirección",icon:"🧭",accent:"#6D5EFF",mods:[["dashboard","📊","Panel general"],["resultados","📈","Estado de resultados"],["informes","📄","Informes"],["permisos","🔐","Permisos"],["trazabilidad","🧾","Trazabilidad"]]},
-  {k:"Finanzas",icon:"💰",accent:"#34D399",mods:[["segmentos","🧩","Centros de costo"],["gastos","🧾","Gastos"],["cobrar","📥","Cuentas por cobrar"]]},
-  {k:"Admisión y socios",icon:"🎫",accent:"#FBBF24",mods:[["socios","👥","Socios / atletas"],["comunicados","📣","Comunicados"],["documentos","🗂️","Documentos"]]},
-  {k:"Marketing",icon:"🎬",accent:"#F472B6",mods:[["marketing","🗓️","Planificación"]]},
-  {k:"Cuerpo deportivo",icon:"🤸",accent:"#60A5FA",mods:[["equipos","🏆","Equipos"],["competencias","🥇","Competencias"]]}
+  {k:"Finanzas",icon:"💰",accent:"#0EA5A5",mods:[["segmentos","🧩","Centros de costo"],["gastos","🧾","Gastos"],["cobrar","📥","Cuentas por cobrar"]]},
+  {k:"Admisión y socios",icon:"🎫",accent:"#F59E0B",mods:[["socios","👥","Socios / atletas"],["comunicados","📣","Comunicados"],["documentos","🗂️","Documentos"]]},
+  {k:"Marketing",icon:"🎬",accent:"#FF4D8D",mods:[["marketing","🗓️","Planificación"]]},
+  {k:"Cuerpo deportivo",icon:"🤸",accent:"#3B82F6",mods:[["equipos","🏆","Equipos"],["competencias","🥇","Competencias"]]}
 ];
-// permisos por defecto de cada área (editables por admin)
-const DEFP={
-  FINANZAS:{dashboard:"ver",resultados:"ver",socios:"editar",segmentos:"editar",gastos:"editar",cobrar:"editar",informes:"editar"},
-  ADMISION:{dashboard:"ver",socios:"editar",comunicados:"editar",documentos:"editar"},
-  MARKETING:{dashboard:"ver",marketing:"editar",comunicados:"ver",competencias:"ver",documentos:"ver"},
-  TECNICO:{dashboard:"ver",equipos:"editar",competencias:"editar",socios:"ver"}
-};
-let STATE={role:null,screen:"home"};
-function permOf(role,m){
-  if(role==="ADMIN")return "edit";
-  if(role==="GERENCIA")return m==="permisos"?"edit":"view";
-  if(role==="ADMIN"||role==="GERENCIA")return "edit";
-  const o=(CFG.perms[role]||{})[m];
-  const v=o!==undefined?o:(DEFP[role]||{})[m];
-  return v==="editar"?"edit":v==="ver"?"view":"none";
-}
+const DEFP={FINANZAS:{dashboard:"ver",resultados:"ver",socios:"editar",segmentos:"editar",gastos:"editar",cobrar:"editar",informes:"editar"},ADMISION:{dashboard:"ver",socios:"editar",comunicados:"editar",documentos:"editar"},MARKETING:{dashboard:"ver",marketing:"editar",comunicados:"ver",competencias:"ver",documentos:"ver"},TECNICO:{dashboard:"ver",equipos:"editar",competencias:"editar",socios:"ver"}};
+let STATE={role:null,screen:"home",_permArea:null};
+let HIST=[];
+function permOf(role,m){if(role==="ADMIN")return "edit";if(role==="GERENCIA")return m==="permisos"?"edit":"view";const o=(CFG.perms[role]||{})[m];const val=o!==undefined?o:(DEFP[role]||{})[m];return val==="editar"?"edit":val==="ver"?"view":"none";}
 const perm=(m)=>STATE.role==="SOCIO"?"none":permOf(STATE.role,m);
 const canE=(m)=>perm(m)==="edit";
 const k=(mm)=>"$"+mm.toLocaleString("es-CL")+"k";
 
 /* ═════ LOGIN / SIDEBAR / ROUTER ═════ */
 function renderRoles(){document.getElementById("roleGrid").innerHTML=Object.keys(ROLES).map(r=>`<button class="role-btn ${r==="SOCIO"?"socio":""}" onclick="login('${r}')"><span class="rn">${ROLES[r].icon} ${ROLES[r].label}</span><span class="rd">${ROLES[r].desc}</span></button>`).join("");}
-function login(role){STATE.role=role;STATE.screen=role==="SOCIO"?"socio":"home";document.getElementById("login").style.display="none";document.getElementById("app").classList.add("on");document.getElementById("roleChip").textContent=ROLES[role].icon+" "+ROLES[role].label;buildSide();route(STATE.screen);applyCfg();}
+function login(role){STATE.role=role;STATE.screen=role==="SOCIO"?"socio":"home";HIST=[];document.getElementById("login").style.display="none";document.getElementById("app").classList.add("on");document.getElementById("roleChip").textContent=ROLES[role].icon+" "+ROLES[role].label;buildSide();route(STATE.screen);applyCfg();}
 function logout(){document.getElementById("app").classList.remove("on");document.body.classList.remove("menu");document.getElementById("login").style.display="grid";scrollTo(0,0);}
 function buildSide(){const s=document.getElementById("side");
   if(STATE.role==="SOCIO"){s.innerHTML=`<div class="grp">📱 App del socio</div>`+[["socio","🏠","Inicio"],["novedades","📣","Novedades"],["qr","🔳","Mi QR"]].map(navA).join("");return;}
   let h="";GROUPS.forEach(G=>{const m=G.mods.filter(x=>perm(x[0])!=="none");if(!m.length)return;h+=`<div class="grp"><span>${G.icon}</span> ${G.k}</div>`+m.map(navA).join("");});
   h+=`<div class="grp">❓ Ayuda</div>`+navA(["guia","📘","Guía de uso"]);s.innerHTML=h;}
 function navA(m){const id=m[0],pv=STATE.role==="SOCIO"?"":perm(id);const tag=pv==="edit"?`<span class="tag">editar</span>`:pv==="view"?`<span class="tag">ver</span>`:"";return `<a onclick="go('${id}')" data-m="${id}"><span class="ico">${m[1]}</span> ${m[2]} ${tag}</a>`;}
-function go(s){STATE.screen=s;document.body.classList.remove("menu");route(s);}
+function go(s){if(STATE.screen&&STATE.screen!==s)HIST.push(STATE.screen);STATE.screen=s;document.body.classList.remove("menu");route(s);}
+function goBack(){if(!HIST.length)return;STATE.screen=HIST.pop();route(STATE.screen);}
 function route(scr){document.querySelectorAll("#side a").forEach(a=>a.classList.toggle("active",a.dataset.m===scr));
+  document.getElementById("backBtn").classList.toggle("show",HIST.length>0);
   const R={home:scrHome,dashboard:scrDash,resultados:scrRes,socios:scrSocios,segmentos:scrSeg,gastos:scrGastos,cobrar:scrCobrar,equipos:scrEquipos,comunicados:scrCom,marketing:scrMkt,competencias:scrComp,documentos:scrDoc,informes:scrInf,permisos:scrPerms,trazabilidad:scrTraza,guia:scrGuia,socio:scrSocioHome,novedades:scrNov,qr:scrQR};
-  const w=document.getElementById("wrap");w.classList.remove("fade");void w.offsetWidth;w.classList.add("fade");w.innerHTML=(R[scr]||scrHome)();}
+  const w=document.getElementById("wrap");w.classList.remove("fade");void w.offsetWidth;w.classList.add("fade");w.innerHTML=(R[scr]||scrHome)();scrollTo(0,0);}
 function head(t,s){return `<div class="h-row"><div><h1 class="title">${t}</h1>${s?`<p class="subt">${s}</p>`:""}</div></div>`}
+function TW(inner){return `<div class="tw card">${inner}</div>`}
 
-/* ═════ CÁLCULOS FINANZAS ═════ */
+/* ═════ FINANZAS ═════ */
 function gastoDe(code){return CFG.gastos.filter(g=>g[1]===code).reduce((a,g)=>a+g[3],0);}
 function filas(){return CFG.centros.map(c=>{const eg=c[3]+gastoDe(c[1]);return{n:c[0],code:c[1],ing:c[2],eg,res:c[2]-eg};});}
 function tot(){const f=filas();return{ing:f.reduce((a,x)=>a+x.ing,0),eg:f.reduce((a,x)=>a+x.eg,0)};}
 function saldoC(){return DATA.cobrar.reduce((a,c)=>a+(c[2]-c[3]),0);}
 
 /* ═════ PANTALLAS ═════ */
+const DASHW=[["socios","Socios activos","294","var(--c1)"],["ingresos","Ingresos del mes","$13,2M","var(--c2)"],["morosidad","Morosidad","12%","var(--c3)"],["ocupacion","Ocupación","78%","var(--c4)"]];
 function scrHome(){const t=tot();
-  const kp=[["Socios activos","294","socios"],["Ingresos del mes",k(t.ing),"segmentos"],["Resultado",k(t.ing-t.eg),"resultados"],["Por cobrar",k(saldoC()),"cobrar"]].filter(x=>perm(x[2])!=="none");
+  const kp=[["socios","Socios activos","294","segmentos"===0?0:"socios","var(--c1)"],["seg","Ingresos del mes",k(t.ing),"segmentos","var(--c2)"],["res","Resultado",k(t.ing-t.eg),"resultados","var(--c3)"],["cob","Por cobrar",k(saldoC()),"cobrar","var(--c4)"]].filter(x=>perm(x[3])!=="none");
   let cards="";GROUPS.forEach(G=>{const m=G.mods.filter(x=>perm(x[0])!=="none");if(!m.length)return;cards+=`<div class="area"><h2><span class="ai" style="background:${G.accent}26;color:${G.accent}">${G.icon}</span> ${G.k}</h2>`+m.map(x=>`<button class="mod" onclick="go('${x[0]}')"><span class="mi">${x[1]}</span><span class="ml">${x[2]}</span><span class="tg ${perm(x[0])==="edit"?"e":"v"}">${perm(x[0])==="edit"?"editar":"ver"}</span></button>`).join("")+`</div>`;});
   return head("Hola 👋 — "+ROLES[STATE.role].label,"Ves y editas solo lo que tu área tiene habilitado.")+
-    (kp.length?`<div class="grid g4" style="margin-bottom:18px">${kp.map(x=>`<div class="kpi"><div class="l">${x[0]}</div><div class="v num">${x[1]}</div></div>`).join("")}</div>`:"")+`<div class="grid g2">${cards}</div>`;}
+    (kp.length?`<div class="grid g4" style="margin-bottom:18px">${kp.map(x=>`<div class="kpi" style="--kc:${x[4]}"><div class="l">${x[1]}</div><div class="v num">${x[2]}</div></div>`).join("")}</div>`:"")+`<div class="grid g2">${cards}</div>`;}
 function chart(){const mx=Math.max(...DATA.bars.flatMap(b=>[b[1],b[2]]));return `<div class="bars">${DATA.bars.map(b=>`<div class="col"><div class="bb"><i class="inc" style="height:${b[1]/mx*100}%"></i><i class="exp" style="height:${b[2]/mx*100}%"></i></div><span class="cl">${b[0]}</span></div>`).join("")}</div><div style="display:flex;gap:16px;margin-top:10px;font-size:11.5px;color:var(--muted)"><span>▮ Ingresos</span><span style="opacity:.6">▮ Gastos</span></div>`;}
-function scrDash(){const cats=[["Infantil",80],["Juvenil",100],["Competitivo",114]];
-  return head("Panel general","Datos de demostración · últimos 30 días")+`<div class="grid g4" style="margin-bottom:14px"><div class="kpi"><div class="l">Socios activos</div><div class="v num">294</div></div><div class="kpi"><div class="l">Ingresos del mes</div><div class="v num">$13,2M</div></div><div class="kpi"><div class="l">Morosidad</div><div class="v num">12%</div></div><div class="kpi"><div class="l">Ocupación</div><div class="v num">78%</div></div></div><div class="grid g2"><div class="card pad"><h3 style="font-size:14px">Ingresos vs. gastos (6 meses)</h3>${chart()}</div><div class="card pad"><h3 style="font-size:14px;margin-bottom:12px">Atletas por categoría</h3>${cats.map(c=>`<div style="margin-bottom:11px"><div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:5px"><span>${c[0]}</span><span class="num" style="color:var(--muted)">${c[1]}</span></div><div class="track"><i style="width:${c[1]/1.3}%;background:var(--grad)"></i></div></div>`).join("")}</div></div>`;}
+function scrDash(){const e=STATE.role==="ADMIN"||STATE.role==="GERENCIA";const on=CFG.dash;
+  const cats=[["Infantil",80,"var(--c1)"],["Juvenil",100,"var(--c2)"],["Competitivo",114,"var(--c3)"]];
+  const kpis=DASHW.filter(w=>on.includes(w[0])).map(w=>`<div class="kpi" style="--kc:${w[3]}"><div class="l">${w[1]}</div><div class="v num">${w[2]}</div></div>`).join("");
+  let widgets="";
+  if(on.includes("chart"))widgets+=`<div class="card pad"><h3 style="font-size:14px">Ingresos vs. gastos (6 meses)</h3>${chart()}</div>`;
+  if(on.includes("cats"))widgets+=`<div class="card pad"><h3 style="font-size:14px;margin-bottom:12px">Atletas por categoría</h3>${cats.map(c=>`<div style="margin-bottom:11px"><div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:5px"><span>${c[0]}</span><span class="num" style="color:var(--muted)">${c[1]}</span></div><div class="track"><i style="width:${c[1]/1.3}%;background:${c[2]}"></i></div></div>`).join("")}</div>`;
+  const chooser=e?`<div class="card pad" style="margin-bottom:14px"><h3 style="font-size:13.5px;margin-bottom:8px">🎛️ Personalizar panel — elige qué ver</h3><div style="display:flex;gap:14px;flex-wrap:wrap">${[["socios","Socios"],["ingresos","Ingresos"],["morosidad","Morosidad"],["ocupacion","Ocupación"],["chart","Gráfico ingresos/gastos"],["cats","Atletas por categoría"]].map(w=>`<label style="font-size:12.5px;display:flex;gap:6px;align-items:center"><input type="checkbox" ${on.includes(w[0])?"checked":""} onchange="toggleDash('${w[0]}')"> ${w[1]}</label>`).join("")}</div></div>`:"";
+  return head("Panel general","Datos de demostración · configura qué mostrar")+chooser+
+    (kpis?`<div class="grid g4" style="margin-bottom:14px">${kpis}</div>`:"")+(widgets?`<div class="grid g2">${widgets}</div>`:`<p class="note">Activa arriba lo que quieras ver.</p>`);}
+function toggleDash(w){const i=CFG.dash.indexOf(w);if(i>=0)CFG.dash.splice(i,1);else CFG.dash.push(w);save(true);route("dashboard");}
 function rowsCentros(){return filas().map(c=>`<tr><td style="font-weight:600">${c.n}<div style="font-size:11px;color:var(--muted)">${c.code}</div></td><td style="text-align:right;color:var(--good)">${k(c.ing)}</td><td style="text-align:right;color:var(--bad)">${k(c.eg)}</td><td style="text-align:right;font-weight:700;${c.res<0?'color:var(--bad)':''}">${k(c.res)}</td></tr>`).join("");}
 function scrRes(){const t=tot(),sc=saldoC();
-  return head("Estado de resultados","Vista de gerencia · ingresos, gastos, resultado y cobros")+`<div class="grid g4" style="margin-bottom:14px"><div class="kpi"><div class="l">Ingresos</div><div class="v num" style="color:var(--good)">${k(t.ing)}</div></div><div class="kpi"><div class="l">Gastos</div><div class="v num" style="color:var(--bad)">${k(t.eg)}</div></div><div class="kpi"><div class="l">Resultado</div><div class="v num">${k(t.ing-t.eg)}</div></div><div class="kpi"><div class="l">Por cobrar</div><div class="v num">${k(sc)}</div></div></div><div class="grid g2"><div class="card pad"><h3 style="font-size:14px">Ingresos vs. gastos</h3>${chart()}</div><div class="card" style="overflow:hidden"><h3 style="font-size:14px;padding:15px 16px 4px">Resultado por centro de costo</h3><table><thead><tr><td>Centro</td><td style="text-align:right">Ingresos</td><td style="text-align:right">Gastos</td><td style="text-align:right">Resultado</td></tr></thead><tbody>${rowsCentros()}</tbody></table></div></div><div class="note" style="margin-top:12px">Los gastos ingresados en Administración se reflejan aquí. Total por cobrar: <b>${k(sc)}</b>.</div>`;}
+  return head("Estado de resultados","Vista de gerencia · ingresos, gastos, resultado y cobros")+`<div class="grid g4" style="margin-bottom:14px"><div class="kpi" style="--kc:var(--good)"><div class="l">Ingresos</div><div class="v num">${k(t.ing)}</div></div><div class="kpi" style="--kc:var(--bad)"><div class="l">Gastos</div><div class="v num">${k(t.eg)}</div></div><div class="kpi" style="--kc:var(--c1)"><div class="l">Resultado</div><div class="v num">${k(t.ing-t.eg)}</div></div><div class="kpi" style="--kc:var(--c4)"><div class="l">Por cobrar</div><div class="v num">${k(sc)}</div></div></div><div class="grid g2"><div class="card pad"><h3 style="font-size:14px">Ingresos vs. gastos</h3>${chart()}</div>${TW(`<table><thead><tr><td>Centro</td><td style="text-align:right">Ingresos</td><td style="text-align:right">Gastos</td><td style="text-align:right">Resultado</td></tr></thead><tbody>${rowsCentros()}</tbody></table>`)}</div><div class="note" style="margin-top:12px">Los gastos ingresados en Administración se reflejan aquí. Total por cobrar: <b>${k(sc)}</b>.</div>`;}
 function scrSeg(){const e=canE("segmentos");
-  const rows=CFG.centros.map((c,i)=>{const eg=c[3]+gastoDe(c[1]);return `<tr><td style="font-weight:600">${c[0]}<div style="font-size:11px;color:var(--muted)">${c[1]}</div></td><td style="text-align:right;color:var(--good)">${k(c[2])}</td><td style="text-align:right;color:var(--bad)">${k(eg)}</td><td style="text-align:right;font-weight:700;${c[2]-eg<0?'color:var(--bad)':''}">${k(c[2]-eg)}</td><td style="text-align:right">${e?`<button class="btn sm ghost" onclick="delCentro(${i})">Eliminar</button>`:""}</td></tr>`}).join("");
-  return head("Centros de costo","Créalos y edítalos según tu club — no vienen fijos")+
-    (e?`<div class="card pad" style="margin-bottom:14px"><h3 style="font-size:14px;margin-bottom:12px">Crear centro de costo</h3><div class="grid g4"><div><label class="fl">Nombre</label><input class="inp" id="ccN" placeholder="Ej: Escuela verano"></div><div><label class="fl">Código</label><input class="inp" id="ccC" placeholder="CC-300"></div><div><label class="fl">Ingreso estim. (miles $)</label><input class="inp" id="ccI" type="number" placeholder="0"></div><div><label class="fl">Gasto base (miles $)</label><input class="inp" id="ccG" type="number" placeholder="0"></div></div><button class="btn" style="margin-top:12px" onclick="addCentro()">+ Crear centro</button></div>`:`<p class="note" style="margin-bottom:14px">Tu área ve los centros de costo en modo lectura.</p>`)+
-    `<div class="card" style="overflow:hidden"><table><thead><tr><td>Centro de costo</td><td style="text-align:right">Ingresos</td><td style="text-align:right">Gastos</td><td style="text-align:right">Resultado</td><td></td></tr></thead><tbody>${rows||`<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:22px">Aún no hay centros de costo. Crea el primero arriba.</td></tr>`}</tbody></table></div>`;}
-function addCentro(){const n=v("ccN"),c=v("ccC")||("CC-"+(CFG.centros.length+1)),i=+v("ccI")||0,g=+v("ccG")||0;if(!n){alert("Ponle un nombre al centro.");return;}CFG.centros.push([n,c,i,g]);save();route("segmentos");}
-function delCentro(i){CFG.centros.splice(i,1);save();route("segmentos");}
+  const rows=CFG.centros.map((c,i)=>{const eg=c[3]+gastoDe(c[1]);return `<tr><td style="font-weight:600">${c[0]}<div style="font-size:11px;color:var(--muted)">${c[1]}</div></td><td style="text-align:right;color:var(--good)">${k(c[2])}</td><td style="text-align:right;color:var(--bad)">${k(eg)}</td><td style="text-align:right;font-weight:700;${c[2]-eg<0?'color:var(--bad)':''}">${k(c[2]-eg)}</td><td style="text-align:right">${e?`<button class="btn sm ghost" onclick="delCentro(${i})">🗑 Eliminar</button>`:""}</td></tr>`}).join("");
+  return head("Centros de costo","Créalos y elimínalos según tu academia — nada por defecto")+
+    (e?`<div class="card pad" style="margin-bottom:14px"><h3 style="font-size:14px;margin-bottom:12px">Crear centro de costo</h3><div class="grid g4"><div><label class="fl">Nombre</label><input class="inp" id="ccN" placeholder="Ej: Escuela verano"></div><div><label class="fl">Código</label><input class="inp" id="ccC" placeholder="CC-300"></div><div><label class="fl">Ingreso estim. (miles $)</label><input class="inp" id="ccI" type="number" placeholder="0"></div><div><label class="fl">Gasto base (miles $)</label><input class="inp" id="ccG" type="number" placeholder="0"></div></div><button class="btn" style="margin-top:12px" onclick="addCentro()">💾 Crear centro</button><p class="subt" style="margin-top:8px">Al crearlo aparece automáticamente al registrar gastos y en el estado de resultados.</p></div>`:`<p class="note" style="margin-bottom:14px">Tu área ve los centros de costo en modo lectura.</p>`)+
+    TW(`<table><thead><tr><td>Centro de costo</td><td style="text-align:right">Ingresos</td><td style="text-align:right">Gastos</td><td style="text-align:right">Resultado</td><td></td></tr></thead><tbody>${rows||`<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:22px">Aún no hay centros. Crea el primero arriba.</td></tr>`}</tbody></table>`);}
+function addCentro(){const n=v("ccN"),c=v("ccC")||("CC-"+(CFG.centros.length+1)),i=+v("ccI")||0,g=+v("ccG")||0;if(!n){toast("Ponle un nombre");return;}CFG.centros.push([n,c,i,g]);save();route("segmentos");}
+function delCentro(i){if(!confirm("¿Eliminar este centro de costo?"))return;CFG.centros.splice(i,1);save();route("segmentos");}
 function scrGastos(){const e=canE("gastos");
   const rows=CFG.gastos.slice().reverse().map(g=>{const c=CFG.centros.find(x=>x[1]===g[1]);return `<tr><td>${g[0]}</td><td>${c?c[0]:g[1]}</td><td>${g[2]}</td><td style="color:var(--muted)">${g[4]}</td><td style="text-align:right;font-weight:700;color:var(--bad)">${k(g[3])}</td></tr>`}).join("");
   const opts=CFG.centros.map(c=>`<option value="${c[1]}">${c[0]}</option>`).join("");
+  const cats=GCATS.map(c=>`<option>${c}</option>`).join("");
   return head("Gastos","Ingreso manual (Administración) — alimenta el estado de resultados")+
-    (e?`<div class="card pad" style="margin-bottom:14px"><h3 style="font-size:14px;margin-bottom:12px">Registrar gasto</h3><div class="grid g3"><div><label class="fl">Centro de costo</label><select class="inp" id="gCentro">${opts}</select></div><div><label class="fl">Categoría</label><input class="inp" id="gCat" placeholder="Arriendo, sueldos…"></div><div><label class="fl">Monto (miles $)</label><input class="inp" id="gMonto" type="number" placeholder="850"></div></div><div style="margin-top:10px"><label class="fl">Descripción</label><input class="inp" id="gDesc" placeholder="Detalle"></div><button class="btn" style="margin-top:12px" onclick="addGasto()">+ Registrar gasto</button></div>`:`<p class="note" style="margin-bottom:14px">Tu área ve los gastos en modo lectura.</p>`)+
-    `<div class="card" style="overflow:hidden"><div style="display:flex;justify-content:space-between;padding:14px 16px 4px"><h3 style="font-size:14px">Gastos registrados</h3><b style="color:var(--bad)">${k(CFG.gastos.reduce((a,g)=>a+g[3],0))}</b></div><table><thead><tr><td>Fecha</td><td>Centro</td><td>Categoría</td><td>Detalle</td><td style="text-align:right">Monto</td></tr></thead><tbody>${rows}</tbody></table></div>`;}
-function addGasto(){const c=v("gCentro"),cat=v("gCat")||"Gasto",m=Math.abs(+v("gMonto")||0),d=v("gDesc");if(!m){alert("Ingresa un monto.");return;}const dd=new Date();CFG.gastos.push([String(dd.getDate()).padStart(2,"0")+"-"+String(dd.getMonth()+1).padStart(2,"0"),c,cat,m,d]);save();route("gastos");}
+    (e?`<div class="card pad" style="margin-bottom:14px"><h3 style="font-size:14px;margin-bottom:12px">Registrar gasto</h3><div class="grid g3"><div><label class="fl">Centro de costo</label><select class="inp" id="gCentro">${opts}</select></div><div><label class="fl">Categoría</label><select class="inp" id="gCat" onchange="document.getElementById('gOtro').style.display=this.value==='Otros'?'block':'none'">${cats}</select><input class="inp" id="gOtro" style="display:none;margin-top:6px" placeholder="Especifica el otro gasto"></div><div><label class="fl">Monto (miles $)</label><input class="inp" id="gMonto" type="number" placeholder="850"></div></div><div style="margin-top:10px"><label class="fl">Descripción</label><input class="inp" id="gDesc" placeholder="Detalle"></div><button class="btn" style="margin-top:12px" onclick="addGasto()">💾 Registrar gasto</button></div>`:`<p class="note" style="margin-bottom:14px">Tu área ve los gastos en modo lectura.</p>`)+
+    TW(`<div style="display:flex;justify-content:space-between;padding:14px 16px 4px"><h3 style="font-size:14px">Gastos registrados</h3><b style="color:var(--bad)">${k(CFG.gastos.reduce((a,g)=>a+g[3],0))}</b></div><table><thead><tr><td>Fecha</td><td>Centro</td><td>Categoría</td><td>Detalle</td><td style="text-align:right">Monto</td></tr></thead><tbody>${rows}</tbody></table>`);}
+function addGasto(){let cat=v("gCat");if(cat==="Otros")cat=v("gOtro")||"Otros";const c=v("gCentro"),m=Math.abs(+v("gMonto")||0),d=v("gDesc");if(!m){toast("Ingresa un monto");return;}const dd=new Date();CFG.gastos.push([String(dd.getDate()).padStart(2,"0")+"-"+String(dd.getMonth()+1).padStart(2,"0"),c,cat,m,d]);save();route("gastos");}
 function scrCobrar(){const e=canE("cobrar");const rows=DATA.cobrar.map((c,i)=>{const s=c[2]-c[3],st=s===0?["ok","Pagado"]:c[3]>0?["wn","Abonado"]:["bd","Pendiente"];return `<tr><td style="font-weight:600">${c[0]}</td><td>${c[1]}</td><td style="text-align:right">${k(c[2])}</td><td style="text-align:right">${k(c[3])}</td><td style="text-align:right;font-weight:700">${k(s)}</td><td><span class="chip ${st[0]}">${st[1]}</span></td><td style="text-align:right">${e&&s>0?`<button class="btn sm ghost" onclick="abonar(${i})">Abonar</button>`:""}</td></tr>`}).join("");
-  return head("Cuentas por cobrar","Quién debe qué, por atleta y segmento")+`<div class="grid g3" style="margin-bottom:14px"><div class="kpi"><div class="l">Total por cobrar</div><div class="v num">${k(saldoC())}</div></div><div class="kpi"><div class="l">Cuotas</div><div class="v num">${DATA.cobrar.length}</div></div><div class="kpi"><div class="l">Pendientes</div><div class="v num">${DATA.cobrar.filter(c=>c[2]-c[3]>0).length}</div></div></div><div class="card" style="overflow:hidden"><table><thead><tr><td>Atleta</td><td>Segmento</td><td style="text-align:right">Total</td><td style="text-align:right">Abonado</td><td style="text-align:right">Saldo</td><td>Estado</td><td></td></tr></thead><tbody>${rows}</tbody></table></div>`;}
-function abonar(i){DATA.cobrar[i][3]=DATA.cobrar[i][2];route("cobrar");}
-function scrSocios(){const e=canE("socios");const rows=DATA.socios.map(s=>{const st={ok:["ok","Al día"],wn:["wn","Pendiente"],bd:["bd","Moroso"]}[s[3]];return `<tr><td style="font-weight:600">${s[0]}</td><td>${s[1]}</td><td>${s[2]}</td><td><span class="chip ${st[0]}">${st[1]}</span></td><td style="text-align:right">${e?`<button class="btn sm ghost" onclick="demo('Editar ficha de ${s[0]}')">Editar</button>`:`<span class="chip nt">solo lectura</span>`}</td></tr>`}).join("");return head("Socios / atletas","La base que alimenta todo")+(e?`<div style="margin-bottom:12px"><button class="btn" onclick="demo('Registrar nuevo socio')">+ Registrar socio</button></div>`:"")+`<div class="card" style="overflow:hidden"><table><thead><tr><td>Atleta</td><td>Categoría</td><td>Plan</td><td>Estado</td><td></td></tr></thead><tbody>${rows}</tbody></table></div>`;}
+  return head("Cuentas por cobrar","Quién debe qué, por atleta y segmento")+`<div class="grid g3" style="margin-bottom:14px"><div class="kpi" style="--kc:var(--c4)"><div class="l">Total por cobrar</div><div class="v num">${k(saldoC())}</div></div><div class="kpi" style="--kc:var(--c1)"><div class="l">Cuotas</div><div class="v num">${DATA.cobrar.length}</div></div><div class="kpi" style="--kc:var(--c3)"><div class="l">Pendientes</div><div class="v num">${DATA.cobrar.filter(c=>c[2]-c[3]>0).length}</div></div></div>${TW(`<table><thead><tr><td>Atleta</td><td>Segmento</td><td style="text-align:right">Total</td><td style="text-align:right">Abonado</td><td style="text-align:right">Saldo</td><td>Estado</td><td></td></tr></thead><tbody>${rows}</tbody></table>`)}`;}
+function abonar(i){DATA.cobrar[i][3]=DATA.cobrar[i][2];toast("Abono registrado");route("cobrar");}
+function scrSocios(){const e=canE("socios");const rows=DATA.socios.map(s=>{const st={ok:["ok","Al día"],wn:["wn","Pendiente"],bd:["bd","Moroso"]}[s[3]];return `<tr><td style="font-weight:600">${s[0]}</td><td>${s[1]}</td><td>${s[2]}</td><td><span class="chip ${st[0]}">${st[1]}</span></td><td style="text-align:right">${e?`<button class="btn sm ghost" onclick="demo('Editar ficha de ${s[0]}')">Editar</button>`:`<span class="chip nt">solo lectura</span>`}</td></tr>`}).join("");return head("Socios / atletas","La base que alimenta todo")+(e?`<div style="margin-bottom:12px"><button class="btn" onclick="demo('Registrar nuevo socio')">+ Registrar socio</button></div>`:"")+TW(`<table><thead><tr><td>Atleta</td><td>Categoría</td><td>Plan</td><td>Estado</td><td></td></tr></thead><tbody>${rows}</tbody></table>`);}
 function scrEquipos(){const e=canE("equipos");return head("Equipos","Se arman desde la base de socios")+`<div class="grid g2">${DATA.equipos.map(t=>`<div class="card pad"><div style="display:flex;justify-content:space-between;align-items:start"><h3 style="font-size:15px">${t.n}</h3>${e?`<button class="btn sm ghost" onclick="demo('Asistencia de ${t.n}')">Asistencia</button>`:""}</div><p class="subt">${t.cat} · ${t.sede} · ${t.coach}</p><div style="margin-top:10px;border-top:1px solid var(--line);padding-top:10px">${t.roster.map(r=>`<div style="font-size:13px;padding:3px 0">• ${r}</div>`).join("")}</div></div>`).join("")}</div>`;}
-function scrCom(){const e=canE("comunicados");return head("Comunicados","Los de socios aparecen en la app del socio")+(e?`<div style="margin-bottom:12px"><button class="btn" onclick="demo('Publicar comunicado')">+ Nuevo comunicado</button></div>`:"")+DATA.comunicados.map(c=>`<div class="card pad" style="margin-bottom:10px"><div style="display:flex;gap:8px;align-items:center"><h3 style="font-size:14.5px">${c[0]}</h3><span class="chip ${c[2]==="Socios"?"ok":"nt"}">${c[2]}</span></div><p style="font-size:13px;color:var(--muted);margin-top:5px">${c[1]}</p></div>`).join("");}
+/* COMUNICADOS con PDF */
+function scrCom(){const e=canE("comunicados");
+  const list=CFG.comunicados.map((c,i)=>`<div class="card pad" style="margin-bottom:10px"><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><h3 style="font-size:14.5px">${c[0]}</h3><span class="chip ${c[2]==="Socios"?"ok":"nt"}">${c[2]}</span>${c[3]?`<a class="chip nt" href="${c[3]}" download="${c[0]}.pdf">📄 Descargar PDF</a>`:""}</div><p style="font-size:13px;color:var(--muted);margin-top:5px">${c[1]}</p>${e?`<button class="btn sm ghost" style="margin-top:8px" onclick="delCom(${i})">Eliminar</button>`:""}</div>`).join("");
+  return head("Comunicados","Se publican una vez y todos los socios los ven en su app")+
+    (e?`<div class="card pad" style="margin-bottom:14px"><h3 style="font-size:14px;margin-bottom:12px">Nuevo comunicado</h3><label class="fl">Título</label><input class="inp" id="coT"><label class="fl" style="margin-top:10px">Mensaje</label><textarea class="inp" id="coB" rows="2"></textarea><div class="grid g2" style="margin-top:10px"><div><label class="fl">Para</label><select class="inp" id="coA"><option value="Socios">Socios (app)</option><option value="Interno">Interno (staff)</option></select></div><div><label class="fl">Adjuntar PDF (opcional)</label><input class="inp" type="file" id="coP" accept="application/pdf"></div></div><button class="btn" style="margin-top:12px" onclick="addCom()">💾 Publicar comunicado</button></div>`:`<p class="note" style="margin-bottom:14px">Tu área ve los comunicados en modo lectura.</p>`)+
+    (list||`<p class="note">Sin comunicados aún.</p>`);}
+function addCom(){const t=v("coT");if(!t){toast("Ponle un título");return;}const b=v("coB"),a=v("coA");const f=document.getElementById("coP").files[0];const push=(pdf)=>{CFG.comunicados.unshift([t,b,a,pdf||null]);save();route("comunicados");};if(f){const r=new FileReader();r.onload=()=>push(r.result);r.readAsDataURL(f);}else push(null);}
+function delCom(i){if(!confirm("¿Eliminar comunicado?"))return;CFG.comunicados.splice(i,1);save();route("comunicados");}
 let MKT=DATA.marketing.map(m=>m.slice());
 function scrMkt(){const e=canE("marketing"),cols=[["IDEA","Ideas"],["PLANIFICADO","Planificado"],["PRODUCCION","Producción"],["PUBLICADO","Publicado"]],nx={IDEA:"PLANIFICADO",PLANIFICADO:"PRODUCCION",PRODUCCION:"PUBLICADO",PUBLICADO:null},ic={Instagram:"📷",TikTok:"🎵",Facebook:"👍",YouTube:"▶️"};return head("Planificación de contenidos","Reels y posts por estado")+`<div class="kb">${cols.map(c=>{const cds=MKT.map((m,i)=>[m,i]).filter(x=>x[0][2]===c[0]);return `<div class="kcol"><h3><span>${c[1]}</span><span>${cds.length}</span></h3>${cds.map(x=>`<div class="kcard"><div class="kt">${ic[x[0][1]]||"•"} ${x[0][0]}</div><div class="km">${x[0][1]}</div>${e&&nx[c[0]]?`<button class="btn sm" style="margin-top:7px" onclick="mktAdv(${x[1]})">Avanzar →</button>`:""}</div>`).join("")||`<div style="font-size:11px;color:var(--muted);padding:6px 4px">Vacío</div>`}</div>`}).join("")}</div>`;}
 function mktAdv(i){const nx={IDEA:"PLANIFICADO",PLANIFICADO:"PRODUCCION",PRODUCCION:"PUBLICADO"};MKT[i][2]=nx[MKT[i][2]]||MKT[i][2];route("marketing");}
 function scrComp(){const e=canE("competencias");const rows=CFG.competencias.map((c,i)=>`<div class="card pad" style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;align-items:start"><div><h3 style="font-size:14px">🥇 ${c[0]}</h3><p style="font-size:13px;color:var(--muted)">${c[1]}</p><p style="font-size:11px;color:var(--muted);margin-top:4px">${c[2]||""}</p></div>${e?`<button class="btn sm ghost" onclick="delComp(${i})">Eliminar</button>`:""}</div></div>`).join("");
   return head("Competencias","El cuerpo deportivo define qué registrar — todo editable")+
-    (e?`<div class="card pad" style="margin-bottom:14px"><h3 style="font-size:14px;margin-bottom:12px">Registrar competencia</h3><div class="grid g3"><div><label class="fl">Nombre</label><input class="inp" id="coN" placeholder="Copa Nacional…"></div><div><label class="fl">Resultado</label><input class="inp" id="coR" placeholder="1° lugar / por disputar"></div><div><label class="fl">Fecha y lugar</label><input class="inp" id="coF" placeholder="20-08 · Santiago"></div></div><button class="btn" style="margin-top:12px" onclick="addComp()">+ Registrar</button></div>`:`<p class="note" style="margin-bottom:14px">Tu área ve las competencias en modo lectura.</p>`)+
+    (e?`<div class="card pad" style="margin-bottom:14px"><h3 style="font-size:14px;margin-bottom:12px">Registrar competencia</h3><div class="grid g3"><div><label class="fl">Nombre</label><input class="inp" id="coN" placeholder="Copa Nacional…"></div><div><label class="fl">Resultado</label><input class="inp" id="coR" placeholder="1° lugar / por disputar"></div><div><label class="fl">Fecha y lugar</label><input class="inp" id="coF" placeholder="20-08 · Santiago"></div></div><button class="btn" style="margin-top:12px" onclick="addComp()">💾 Registrar</button></div>`:`<p class="note" style="margin-bottom:14px">Tu área ve las competencias en modo lectura.</p>`)+
     (rows||`<p class="note">Aún no hay competencias registradas.</p>`);}
-function addComp(){const n=v("coN");if(!n){alert("Ponle un nombre.");return;}CFG.competencias.push([n,v("coR"),v("coF")]);save();route("competencias");}
-function delComp(i){CFG.competencias.splice(i,1);save();route("competencias");}
-function scrDoc(){const e=canE("documentos");return head("Documentos del club","Descargables para socios")+(e?`<div style="margin-bottom:12px"><button class="btn" onclick="demo('Agregar documento')">+ Agregar documento</button></div>`:"")+`<div class="card" style="overflow:hidden"><table><tbody>${DATA.documentos.map(d=>`<tr><td>🗂️ ${d[0]}<div style="font-size:11px;color:var(--muted)">${d[1]}</div></td><td style="text-align:right"><button class="btn sm ghost" onclick="demo('Descargar ${d[0]}')">Descargar</button></td></tr>`).join("")}</tbody></table></div>`;}
-/* INFORMES: el cliente elige y se genera CSV */
-const REPORTS={
-  socios:{t:"Base de socios",h:["Atleta","Categoría","Plan","Estado"],r:()=>DATA.socios.map(s=>[s[0],s[1],s[2],{ok:"Al día",wn:"Pendiente",bd:"Moroso"}[s[3]]])},
-  centros:{t:"Centros de costo",h:["Centro","Código","Ingresos(k)","Gastos(k)","Resultado(k)"],r:()=>filas().map(c=>[c.n,c.code,c.ing,c.eg,c.res])},
-  gastos:{t:"Gastos",h:["Fecha","Centro","Categoría","Monto(k)","Detalle"],r:()=>CFG.gastos.map(g=>{const c=CFG.centros.find(x=>x[1]===g[1]);return [g[0],c?c[0]:g[1],g[2],g[3],g[4]]})},
-  cobrar:{t:"Cuentas por cobrar",h:["Atleta","Segmento","Total(k)","Abonado(k)","Saldo(k)"],r:()=>DATA.cobrar.map(c=>[c[0],c[1],c[2],c[3],c[2]-c[3]])},
-  resultado:{t:"Estado de resultados",h:["Centro","Ingresos(k)","Gastos(k)","Resultado(k)"],r:()=>filas().map(c=>[c.n,c.ing,c.eg,c.res])},
-  competencias:{t:"Competencias",h:["Nombre","Resultado","Fecha/Lugar"],r:()=>CFG.competencias.map(c=>[c[0],c[1],c[2]])}
-};
-function scrInf(){const e=canE("informes");
-  return head("Informes","Elige qué informe generar — se descarga en CSV para Excel")+
-    `<div class="card pad"><h3 style="font-size:14px;margin-bottom:6px">Selecciona los informes</h3><p class="subt" style="margin-bottom:12px">Marca los que necesites y presiona generar. Cada uno se descarga listo.</p>
-    <div class="grid g3">${Object.keys(REPORTS).map(kk=>`<label style="display:flex;gap:9px;align-items:center;border:1px solid var(--line);border-radius:11px;padding:11px;cursor:pointer"><input type="checkbox" class="rep" value="${kk}"><span style="font-size:13px;font-weight:600">📄 ${REPORTS[kk].t}</span></label>`).join("")}</div>
-    <button class="btn" style="margin-top:14px" onclick="genRep()">⬇️ Generar y descargar</button>
-    ${e?"":`<p class="note" style="margin-top:12px">Tu área puede visualizar y descargar informes.</p>`}</div>`;}
-function genRep(){const sel=[...document.querySelectorAll(".rep:checked")].map(c=>c.value);if(!sel.length){alert("Marca al menos un informe.");return;}sel.forEach(kk=>{const R=REPORTS[kk];dl(R.t,[R.h,...R.r()]);});}
-function dl(name,rows){const csv="﻿"+rows.map(r=>r.map(x=>String(x).replaceAll(";",",")).join(";")).join("\r\n");const b=new Blob([csv],{type:"text/csv"});const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=name.replace(/\s+/g,"_")+".csv";document.body.appendChild(a);a.click();a.remove();}
-/* PERMISOS: gerencia/admin habilitan botones por área */
-function scrPerms(){const can=(STATE.role==="ADMIN"||STATE.role==="GERENCIA");
-  if(!can)return head("Permisos")+`<p class="note">Solo Gerencia y Administración configuran permisos.</p>`;
+function addComp(){const n=v("coN");if(!n){toast("Ponle un nombre");return;}CFG.competencias.push([n,v("coR"),v("coF")]);save();route("competencias");}
+function delComp(i){if(!confirm("¿Eliminar competencia?"))return;CFG.competencias.splice(i,1);save();route("competencias");}
+function scrDoc(){const e=canE("documentos");return head("Documentos del club","Descargables para socios")+(e?`<div style="margin-bottom:12px"><button class="btn" onclick="demo('Agregar documento')">+ Agregar documento</button></div>`:"")+TW(`<table><tbody>${DATA.documentos.map(d=>`<tr><td>🗂️ ${d[0]}<div style="font-size:11px;color:var(--muted)">${d[1]}</div></td><td style="text-align:right"><button class="btn sm ghost" onclick="demo('Descargar ${d[0]}')">Descargar</button></td></tr>`).join("")}</tbody></table>`);}
+/* INFORMES personalizados: qué + período */
+const REPORTS={socios:{t:"Base de socios",h:["Atleta","Categoría","Plan","Estado"],r:()=>DATA.socios.map(s=>[s[0],s[1],s[2],{ok:"Al día",wn:"Pendiente",bd:"Moroso"}[s[3]]])},centros:{t:"Centros de costo",h:["Centro","Código","Ingresos(k)","Gastos(k)","Resultado(k)"],r:()=>filas().map(c=>[c.n,c.code,c.ing,c.eg,c.res])},gastos:{t:"Gastos",h:["Fecha","Centro","Categoría","Monto(k)","Detalle"],r:()=>CFG.gastos.map(g=>{const c=CFG.centros.find(x=>x[1]===g[1]);return [g[0],c?c[0]:g[1],g[2],g[3],g[4]]})},cobrar:{t:"Cuentas por cobrar",h:["Atleta","Segmento","Total(k)","Abonado(k)","Saldo(k)"],r:()=>DATA.cobrar.map(c=>[c[0],c[1],c[2],c[3],c[2]-c[3]])},resultado:{t:"Estado de resultados",h:["Centro","Ingresos(k)","Gastos(k)","Resultado(k)"],r:()=>filas().map(c=>[c.n,c.ing,c.eg,c.res])},competencias:{t:"Competencias",h:["Nombre","Resultado","Fecha/Lugar"],r:()=>CFG.competencias.map(c=>[c[0],c[1],c[2]])}};
+function scrInf(){return head("Informes","¿Qué quieres descargar?")+
+  `<div class="card pad"><h3 style="font-size:14px">1 · Elige el período</h3><select class="inp" id="repPer" style="max-width:280px;margin-top:8px"><option>Este mes</option><option>Últimos 3 meses</option><option>Últimos 6 meses</option><option>Este año</option><option>Todo el histórico</option></select>
+  <h3 style="font-size:14px;margin-top:16px">2 · Elige los informes</h3><p class="subt" style="margin-bottom:10px">Marca los que necesites; cada uno se descarga en CSV para Excel.</p>
+  <div class="grid g3">${Object.keys(REPORTS).map(kk=>`<label style="display:flex;gap:9px;align-items:center;border:1px solid var(--line);border-radius:11px;padding:11px;cursor:pointer"><input type="checkbox" class="rep" value="${kk}"><span style="font-size:13px;font-weight:600">📄 ${REPORTS[kk].t}</span></label>`).join("")}</div>
+  <button class="btn" style="margin-top:16px" onclick="genRep()">⬇️ Generar y descargar</button></div>`;}
+function genRep(){const sel=[...document.querySelectorAll(".rep:checked")].map(c=>c.value);if(!sel.length){toast("Marca al menos un informe");return;}const per=document.getElementById("repPer").value;sel.forEach(kk=>{const R=REPORTS[kk];dl(R.t+" ("+per+")",[["Período:",per],R.h,...R.r()]);});toast("Informe(s) generado(s) ✓");}
+function dl(name,rows){const csv="﻿"+rows.map(r=>r.map(x=>String(x).replaceAll(";",",")).join(";")).join("\r\n");const b=new Blob([csv],{type:"text/csv"});const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=name.replace(/[^\w]+/g,"_")+".csv";document.body.appendChild(a);a.click();a.remove();}
+function scrPerms(){const can=(STATE.role==="ADMIN"||STATE.role==="GERENCIA");if(!can)return head("Permisos")+`<p class="note">Solo Gerencia y Administración configuran permisos.</p>`;
   const area=STATE._permArea||AREAS_CFG[0];STATE._permArea=area;
   const tabs=AREAS_CFG.map(a=>`<button class="btn sm ${a===area?"":"ghost"}" onclick="setPermArea('${a}')">${ROLES[a].icon} ${ROLES[a].label}</button>`).join(" ");
   const rows=MODLIST.map(m=>{const cur=(CFG.perms[area]||{})[m[0]]!==undefined?CFG.perms[area][m[0]]:((DEFP[area]||{})[m[0]]||"oculto");return `<tr><td>${m[1]} ${m[2]}</td><td style="text-align:right"><select class="selp" onchange="setPerm('${area}','${m[0]}',this.value)">${["oculto","ver","editar"].map(o=>`<option value="${o}" ${o===cur?"selected":""}>${o[0].toUpperCase()+o.slice(1)}</option>`).join("")}</select></td></tr>`}).join("");
-  return head("Permisos por área","Habilita o deshabilita cada botón para cada área")+
-    `<div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px">${tabs}</div>
-    <div class="card" style="overflow:hidden"><table><thead><tr><td>Botón / módulo</td><td style="text-align:right">Acceso de ${ROLES[area].label}</td></tr></thead><tbody>${rows}</tbody></table></div>
-    <p class="note" style="margin-top:12px"><b>Oculto</b>: no aparece · <b>Ver</b>: solo lectura · <b>Editar</b>: puede modificar. Gerencia y Administración siempre ven todo.</p>`;}
+  return head("Permisos por área","Habilita o deshabilita cada botón para cada área")+`<div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px">${tabs}</div>${TW(`<table><thead><tr><td>Botón / módulo</td><td style="text-align:right">Acceso de ${ROLES[area].label}</td></tr></thead><tbody>${rows}</tbody></table>`)}<p class="note" style="margin-top:12px"><b>Oculto</b>: no aparece · <b>Ver</b>: solo lectura · <b>Editar</b>: modifica. Gerencia y Administración siempre ven todo. Se guarda al instante.</p>`;}
 function setPermArea(a){STATE._permArea=a;route("permisos");}
 function setPerm(area,mod,val){if(!CFG.perms[area])CFG.perms[area]={};CFG.perms[area][mod]=val;save();}
-function scrTraza(){const bg={CREAR:"ok",EDITAR:"nt",ELIMINAR:"bd",REGISTRAR:"wn"};return head("Trazabilidad","Quién hizo qué y cuándo")+`<div class="card" style="overflow:hidden"><table><thead><tr><td>Usuario / área</td><td>Acción</td><td>Módulo</td><td>Detalle</td><td>Fecha</td></tr></thead><tbody>${DATA.traza.map(t=>`<tr><td style="font-weight:600">${t[0]}</td><td><span class="chip ${bg[t[1]]}">${t[1]}</span></td><td>${t[2]}</td><td style="color:var(--muted)">${t[3]}</td><td style="color:var(--muted)">${t[4]}</td></tr>`).join("")}</tbody></table></div>`;}
-function scrGuia(){const p=[["💰 Finanzas","Crea tus centros de costo → registra gastos → revisa el estado de resultados."],["🎫 Admisión","Registra socios, publica comunicados y sube documentos."],["🎬 Marketing","Agrega ideas de contenido y avánzalas por estado."],["🤸 Cuerpo deportivo","Registra las competencias que tu club quiera mostrar."],["🔐 Gerencia / Admin","En Permisos habilitan o deshabilitan cada botón por área."]];return head("Guía: cómo ingresar los datos")+p.map(x=>`<div class="card pad" style="margin-bottom:10px"><h3 style="font-size:14.5px">${x[0]}</h3><p style="font-size:13px;color:var(--muted);margin-top:4px">${x[1]}</p></div>`).join("");}
+function scrTraza(){const bg={CREAR:"ok",EDITAR:"nt",ELIMINAR:"bd",REGISTRAR:"wn"};return head("Trazabilidad","Quién hizo qué y cuándo")+TW(`<table><thead><tr><td>Usuario / área</td><td>Acción</td><td>Módulo</td><td>Detalle</td><td>Fecha</td></tr></thead><tbody>${DATA.traza.map(t=>`<tr><td style="font-weight:600">${t[0]}</td><td><span class="chip ${bg[t[1]]}">${t[1]}</span></td><td>${t[2]}</td><td style="color:var(--muted)">${t[3]}</td><td style="color:var(--muted)">${t[4]}</td></tr>`).join("")}</tbody></table>`);}
+function scrGuia(){const p=[["💰 Finanzas","Crea tus centros de costo → registra gastos (incluye 'Otros') → revisa el estado de resultados."],["🎫 Admisión","Registra socios, publica comunicados con PDF y sube documentos."],["🎬 Marketing","Agrega ideas de contenido y avánzalas por estado."],["🤸 Cuerpo deportivo","Registra las competencias que tu academia quiera mostrar."],["🔐 Gerencia / Admin","En Permisos habilitan o deshabilitan cada botón por área."]];return head("Guía: cómo ingresar los datos")+p.map(x=>`<div class="card pad" style="margin-bottom:10px"><h3 style="font-size:14.5px">${x[0]}</h3><p style="font-size:13px;color:var(--muted);margin-top:4px">${x[1]}</p></div>`).join("");}
 function scrSocioHome(){return head("Hola, Amanda 👋",CFG.club)+`<div class="card pad" style="margin-bottom:12px"><h3 style="font-size:13.5px">Mi plan</h3><p style="font-size:19px;font-weight:800;margin-top:4px">Plan Infantil</p><p class="subt">$35.000 / mes</p></div><div class="card pad" style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:13.5px">Estado de pago</span><span class="chip ok">Al día</span></div></div><div class="card pad"><h3 style="font-size:13.5px;margin-bottom:8px">Próxima clase</h3><p style="font-size:13.5px;font-weight:600">Cheer Infantil</p><p class="subt">Lunes 17:00</p></div>`;}
-function scrNov(){return head("Novedades del club")+`<h3 style="font-size:13px;color:var(--muted);margin:4px 0 8px">📣 Comunicados</h3>${DATA.comunicados.filter(c=>c[2]==="Socios").map(c=>`<div class="card pad" style="margin-bottom:8px"><b style="font-size:14px">${c[0]}</b><p style="font-size:13px;color:var(--muted);margin-top:4px">${c[1]}</p></div>`).join("")}<h3 style="font-size:13px;color:var(--muted);margin:16px 0 8px">🥇 Logros</h3>${CFG.competencias.map(c=>`<div class="card pad" style="margin-bottom:8px"><b style="font-size:14px">${c[0]}</b><p style="font-size:12.5px;color:var(--muted)">${c[1]} ${c[2]?"· "+c[2]:""}</p></div>`).join("")}`;}
+function scrNov(){return head("Novedades del club")+`<h3 style="font-size:13px;color:var(--muted);margin:4px 0 8px">📣 Comunicados</h3>${CFG.comunicados.filter(c=>c[2]==="Socios").map(c=>`<div class="card pad" style="margin-bottom:8px"><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><b style="font-size:14px">${c[0]}</b>${c[3]?`<a class="chip nt" href="${c[3]}" download="${c[0]}.pdf">📄 Descargar PDF</a>`:""}</div><p style="font-size:13px;color:var(--muted);margin-top:4px">${c[1]}</p></div>`).join("")||`<p class="note">Sin novedades.</p>`}<h3 style="font-size:13px;color:var(--muted);margin:16px 0 8px">🥇 Logros</h3>${CFG.competencias.map(c=>`<div class="card pad" style="margin-bottom:8px"><b style="font-size:14px">${c[0]}</b><p style="font-size:12.5px;color:var(--muted)">${c[1]} ${c[2]?"· "+c[2]:""}</p></div>`).join("")}`;}
 function scrQR(){return head("Mi código de acceso")+`<div class="card pad" style="text-align:center;max-width:320px;margin:0 auto"><div style="width:170px;height:170px;margin:8px auto;background:repeating-linear-gradient(0deg,var(--text) 0 8px,transparent 8px 16px),repeating-linear-gradient(90deg,var(--text) 0 8px,transparent 8px 16px);border-radius:8px;opacity:.85"></div><p style="font-weight:700;margin-top:10px">Amanda Pérez</p><span class="chip ok">Al día</span></div>`;}
 
 function v(id){const e=document.getElementById(id);return e?e.value.trim():"";}
 function demo(m){alert("Prototipo de demostración\n\n"+m+"\n\nEn el sistema real este botón guarda en la base de datos.");}
-renderRoles();applyCfg();
+applyTheme();renderRoles();applyCfg();
 </script>
 <script>
-(function(){try{var m={name:"Cancha",short_name:"Cancha",start_url:".",display:"standalone",background_color:"#080A16",theme_color:"#6D5EFF",icons:[{src:"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='42' fill='%236D5EFF'/%3E%3Cpath d='M52 126 82 78l24 28 17-40 9 58' fill='none' stroke='%23fff' stroke-width='12' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E",sizes:"192x192 512x512",type:"image/svg+xml",purpose:"any"}]};var b=new Blob([JSON.stringify(m)],{type:"application/manifest+json"});var l=document.createElement("link");l.rel="manifest";l.href=URL.createObjectURL(b);document.head.appendChild(l);}catch(e){}})();
+(function(){try{var m={name:"Hit Zero",short_name:"Hit Zero",start_url:".",display:"standalone",background_color:"#080A16",theme_color:"#6D5EFF",icons:[{src:"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='42' fill='%236D5EFF'/%3E%3Ctext x='96' y='128' font-family='Arial' font-size='90' font-weight='bold' fill='white' text-anchor='middle'%3EHZ%3C/text%3E%3C/svg%3E",sizes:"192x192 512x512",type:"image/svg+xml",purpose:"any"}]};var b=new Blob([JSON.stringify(m)],{type:"application/manifest+json"});var l=document.createElement("link");l.rel="manifest";l.href=URL.createObjectURL(b);document.head.appendChild(l);}catch(e){}})();
 </script>
 </body>
 </html>
