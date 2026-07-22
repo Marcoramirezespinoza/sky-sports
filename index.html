@@ -346,6 +346,33 @@ function dlPlantillaCobrar(){dl("plantilla_cuentas_por_cobrar",[["Atleta","Segme
 function importCentrosCSV(ev){const f=ev.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{let rows=parseCSV(r.result);if(!rows.length){toast("CSV vacío");return;}if(/nombre|c[oó]digo/i.test(rows[0].join(" ")))rows=rows.slice(1);let n=0;rows.forEach(c=>{if(!c[0])return;CFG.centros.push([c[0],c[1]||("CC-"+(CFG.centros.length+1)),Math.abs(+c[2]||0),Math.abs(+c[3]||0)]);n++;});save(true);toast(n+" centros de costo importados ✓");route("datos");};r.readAsText(f);}
 function importGastosCSV(ev){const f=ev.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{let rows=parseCSV(r.result);if(!rows.length){toast("CSV vacío");return;}if(/fecha|c[oó]digo/i.test(rows[0].join(" ")))rows=rows.slice(1);let n=0,omit=0;rows.forEach(c=>{if(!c[0])return;const centroOk=CFG.centros.some(cc=>cc[1]===c[1]);if(!centroOk){omit++;return;}CFG.gastos.push([c[0]||"—",c[1],c[2]||"Otros",Math.abs(+c[3]||0),c[4]||""]);n++;});save(true);toast(n+" gastos importados"+(omit?` (${omit} omitidos: código de centro no existe)`:"")+" ✓");route("datos");};r.readAsText(f);}
 function importCobrarCSV(ev){const f=ev.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{let rows=parseCSV(r.result);if(!rows.length){toast("CSV vacío");return;}if(/atleta|total/i.test(rows[0].join(" ")))rows=rows.slice(1);let n=0;rows.forEach(c=>{if(!c[0])return;CFG.cobrar.push([c[0],c[1]||"",Math.abs(+c[2]||0),Math.abs(+c[3]||0)]);n++;});save(true);toast(n+" cuentas por cobrar importadas ✓");route("datos");};r.readAsText(f);}
+function dlPlantillaMensualidades(){dl("plantilla_mensualidades",[["Nombre","Categoría","Monto mensual (miles $)","Estado"],["Ejemplo Atleta","Infantil","35","Al día"],["Otro Atleta","Juvenil","45","Moroso"]]);}
+/**
+ * Importador especial: una sola planilla de mensualidades sincroniza 3 partes
+ * a la vez — crea/actualiza el atleta, genera su cuenta por cobrar si debe,
+ * y suma el ingreso real recaudado al centro de costo "Membresías".
+ */
+function importMensualidadesCSV(ev){const f=ev.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{
+  let rows=parseCSV(r.result);if(!rows.length){toast("CSV vacío");return;}
+  if(/nombre|categor|monto|estado/i.test(rows[0].join(" ")))rows=rows.slice(1);
+  let nSoc=0,nCob=0,ingresoTotal=0,montoTotal=0;
+  rows.forEach(c=>{
+    if(!c[0])return;
+    const nombre=c[0],categoria=c[1]||"",monto=Math.abs(+c[2]||0);
+    const estRaw=(c[3]||"").toLowerCase();
+    const code=/moro|deb|atras/.test(estRaw)?"bd":/pend/.test(estRaw)?"wn":"ok";
+    const abonado=c[4]!==undefined&&c[4]!==""?Math.abs(+c[4]||0):(code==="ok"?monto:0);
+    CFG.socios.push([nombre,categoria,"Mensualidad",code]);nSoc++;
+    montoTotal+=monto;ingresoTotal+=abonado;
+    if(abonado<monto){CFG.cobrar.push([nombre,"Mensualidad",monto,abonado]);nCob++;}
+  });
+  let cc=CFG.centros.find(x=>x[1]==="CC-100"||/membres/i.test(x[0]));
+  if(!cc){cc=["Membresías","CC-100",0,0];CFG.centros.push(cc);}
+  cc[2]+=ingresoTotal;
+  save(true);
+  toast(`${nSoc} mensualidades cargadas · ${k(ingresoTotal)} recaudados · ${nCob} con saldo pendiente ✓`);
+  route("datos");
+};r.readAsText(f);}
 function save(silent){try{localStorage.setItem("hz_cfg",JSON.stringify(CFG));if(!silent)toast("Guardado ✓")}catch(e){alert("No se pudo guardar (archivo muy grande). Prueba un PDF más liviano.")}}
 function resetAll(){localStorage.removeItem("hz_cfg");CFG=load();applyTheme();applyCfg();closeCust();if(STATE.role){buildSide();route(STATE.screen);}}
 function toast(m){const t=document.getElementById("toast");t.textContent=m;t.classList.add("on");clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove("on"),1600);}
@@ -511,7 +538,13 @@ function scrDatos(){if(STATE.role!=="ADMIN")return head("Datos")+`<p class="note
   return head("Datos e importación","Arranca tu piloto real: parte de cero, importa y respalda")+
     `<div class="note" style="margin-bottom:16px">📊 <b>Contenido actual:</b> ${cnt}</div>
     <div class="card pad" style="margin-bottom:14px"><h3 style="font-size:15px">🚀 Empezar el piloto</h3><p class="subt" style="margin:6px 0 12px">Borra los datos de ejemplo y arranca en blanco para cargar los reales.</p><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" onclick="startEmpty()">Empezar vacío</button><button class="btn ghost" onclick="resetAll()">Restaurar demo</button></div></div>
-    <h3 style="font-size:14px;color:var(--muted);margin-bottom:10px">Tienes los datos en distintas planillas de Excel — guarda cada pestaña como CSV y súbela en su botón correspondiente:</h3>
+    <div class="card pad" style="margin-bottom:14px;border:2px solid var(--brand)">
+      <div style="display:flex;align-items:center;gap:8px"><span style="font-size:20px">⭐</span><h3 style="font-size:15.5px">Empieza aquí: Mensualidades</h3></div>
+      <p class="subt" style="margin:8px 0 10px">Sube una sola planilla y el sistema hace 3 cosas a la vez: <b>registra a cada atleta</b>, <b>crea su cobro pendiente</b> si debe, y <b>suma el ingreso real</b> al centro "Membresías" — todo automático.</p>
+      <p style="font-size:12.5px;color:var(--muted);margin-bottom:10px">Columnas: <b>Nombre, Categoría, Monto mensual, Estado</b> (Al día / Pendiente / Moroso). Opcional: Abonado.</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap"><label class="btn" style="cursor:pointer">📥 Subir planilla de mensualidades<input type="file" accept=".csv,text/csv" style="display:none" onchange="importMensualidadesCSV(event)"></label><button class="btn ghost" onclick="dlPlantillaMensualidades()">📄 Descargar plantilla</button></div>
+    </div>
+    <h3 style="font-size:14px;color:var(--muted);margin-bottom:10px">¿Otras planillas? Guarda cada pestaña como CSV y súbela en su botón:</h3>
     <div class="grid g2" style="margin-bottom:14px">
       ${importer("Atletas / socios","Tu lista de alumnos, desde cualquier pestaña de Excel.","Nombre, Categoría, Plan, Estado","importSociosCSV","dlPlantilla")}
       ${importer("Centros de costo","Los segmentos de tu club (Trajes, Campeonatos, Clínica…).","Nombre, Código, Ingresos, Gastos base","importCentrosCSV","dlPlantillaCentros")}
