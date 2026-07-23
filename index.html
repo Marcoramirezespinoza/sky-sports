@@ -122,6 +122,8 @@
   .rolechip{font-size:11.5px;font-weight:650;color:var(--brand);background:var(--brand-soft);padding:6px 11px;border-radius:999px;white-space:nowrap}
   .ib{background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:7px 10px;font-size:12.5px;font-weight:600;color:var(--text)}
   .ib:hover{border-color:var(--brand)}
+  .syncdot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--muted);margin-right:3px}
+  .syncdot.ok{background:var(--good)}.syncdot.error{background:var(--bad)}
 
   .side{background:var(--surface);border-right:1px solid var(--line);padding:12px 10px;overflow-y:auto}
   .side .grp{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);padding:12px 10px 4px;display:flex;gap:6px}
@@ -284,6 +286,7 @@
     </div>
     <div class="tacts">
       <span class="rolechip" id="roleChip"></span>
+      <button class="ib" onclick="abrirSync()" title="Sincronización entre aparatos"><span class="syncdot" id="syncDot"></span> 🔄</button>
       <button class="ib" onclick="openCust()">🏷️</button>
       <button class="ib" onclick="toggleTheme()" id="thBtn">◐</button>
       <button class="ib" onclick="logout()">Salir</button>
@@ -307,6 +310,26 @@
     <button class="btn ghost" onclick="rmLogo()">Quitar logo</button>
     <button class="btn ghost" onclick="resetAll()">Restablecer</button>
   </div>
+</div></div>
+
+<div class="modal" id="syncModal"><div class="msheet">
+  <h2>🔄 Sincronización entre aparatos</h2>
+  <p class="subt" id="syncStatus" style="margin:4px 0 14px">—</p>
+  <div id="syncLinkedBox" style="display:none">
+    <label class="fl">Código para vincular OTRO aparato (cópialo y pégalo ahí)</label>
+    <textarea class="inp" id="syncCodeOut" rows="3" readonly onclick="this.select()"></textarea>
+    <button class="btn sm ghost" style="margin-top:8px" onclick="copiarCodigo()">📋 Copiar código</button>
+    <button class="btn sm ghost" style="margin-top:8px" onclick="syncPull()">🔄 Actualizar ahora</button>
+    <button class="btn sm ghost" style="margin-top:8px" onclick="desvincular()">Desvincular este aparato</button>
+  </div>
+  <div id="syncUnlinkedBox">
+    <div class="note" style="margin-bottom:12px">Este aparato guarda todo localmente hasta que lo vincules a un servidor. Un administrador debe generar el vínculo una vez (necesita la URL del servidor ya publicado).</div>
+    <button class="btn" onclick="generarClub()">➕ Generar vínculo nuevo (primer aparato)</button>
+    <label class="fl" style="margin-top:16px">O pega aquí el código de otro aparato ya vinculado</label>
+    <textarea class="inp" id="syncCodeIn" rows="3" placeholder="Pega el código…"></textarea>
+    <button class="btn" style="margin-top:8px" onclick="vincularConCodigo()">🔗 Vincular con este código</button>
+  </div>
+  <button class="btn ghost" style="margin-top:16px" onclick="cerrarSync()">Cerrar</button>
 </div></div>
 
 <div class="tt" id="toast"></div>
@@ -412,7 +435,81 @@ function importMensualHistoricoCSV(ev){const f=ev.target.files[0];if(!f)return;c
   toast(`${nFilas} registros de ${mesesSet.size} mes(es) importados — Socios, Cobrar, Resultados y Equipos ya reflejan esto ✓`);
   route("mensual");
 };r.readAsText(f);}
-function save(silent){try{localStorage.setItem("hz_cfg",JSON.stringify(CFG));if(!silent)toast("Guardado ✓")}catch(e){alert("No se pudo guardar (archivo muy grande). Prueba un PDF más liviano.")}}
+function save(silent){try{localStorage.setItem("hz_cfg",JSON.stringify(CFG));if(!silent)toast("Guardado ✓")}catch(e){alert("No se pudo guardar (archivo muy grande). Prueba un PDF más liviano.")}syncPush();}
+
+/* ═════ SINCRONIZACIÓN ENTRE APARATOS ═════
+   Config de conexión (NO viaja en CFG — es propia de cada aparato, se guarda aparte).
+   Si no está configurada, el piloto sigue funcionando 100% local (como antes). */
+let SYNCING=false,SYNC_LAST=0;
+function getSync(){try{return JSON.parse(localStorage.getItem("hz_sync")||"null")}catch(e){return null}}
+function setSyncCfg(s){localStorage.setItem("hz_sync",JSON.stringify(s));}
+function syncActivo(){const s=getSync();return !!(s&&s.api&&s.club&&s.key);}
+function codigoVinculo(s){return btoa(unescape(encodeURIComponent(JSON.stringify(s))));}
+function leerCodigoVinculo(code){try{return JSON.parse(decodeURIComponent(escape(atob(code.trim()))))}catch(e){return null}}
+async function syncPull(silentFail){
+  const s=getSync();if(!s)return false;
+  try{
+    const r=await fetch(`${s.api}/api/state/${encodeURIComponent(s.club)}`,{headers:{"x-club-key":s.key}});
+    if(!r.ok)throw new Error("HTTP "+r.status);
+    const j=await r.json();
+    if(j.data){
+      const remoteTs=new Date(j.updatedAt||0).getTime();
+      if(remoteTs>SYNC_LAST){
+        CFG=Object.assign(load(),j.data);
+        localStorage.setItem("hz_cfg",JSON.stringify(CFG));
+        SYNC_LAST=remoteTs;
+        if(STATE.role){buildSide();route(STATE.screen);}
+      }
+    }
+    setSyncEstado("ok");
+    return true;
+  }catch(e){setSyncEstado("error");if(!silentFail)toast("No se pudo sincronizar — revisa la conexión");return false;}
+}
+async function syncPush(){
+  const s=getSync();if(!s||SYNCING)return;
+  SYNCING=true;
+  try{
+    const r=await fetch(`${s.api}/api/state/${encodeURIComponent(s.club)}`,{method:"PUT",headers:{"Content-Type":"application/json","x-club-key":s.key},body:JSON.stringify(CFG)});
+    if(!r.ok)throw new Error("HTTP "+r.status);
+    const j=await r.json();SYNC_LAST=new Date(j.updatedAt).getTime();
+    setSyncEstado("ok");
+  }catch(e){setSyncEstado("error");}
+  SYNCING=false;
+}
+function setSyncEstado(v){const b=document.getElementById("syncDot");if(b)b.className="syncdot "+v;}
+function iniciarPolling(){if(!syncActivo())return;setInterval(()=>syncPull(true),20000);}
+function abrirSync(){
+  const s=getSync();
+  const modal=document.getElementById("syncModal");
+  document.getElementById("syncStatus").textContent=s?`✅ Vinculado a: ${s.club} — se sincroniza solo cada 20s`:"⚪ Este aparato aún no está vinculado. Trabaja 100% local.";
+  document.getElementById("syncLinkedBox").style.display=s?"block":"none";
+  document.getElementById("syncUnlinkedBox").style.display=s?"none":"block";
+  if(s)document.getElementById("syncCodeOut").value=codigoVinculo(s);
+  modal.classList.add("on");
+}
+function cerrarSync(){document.getElementById("syncModal").classList.remove("on");}
+function generarClub(){
+  const nombre=prompt("Nombre para este club/academia (ej: hitzero-laserena):","hitzero-club");
+  if(!nombre)return;
+  const api=prompt("URL del servidor (te la doy yo tras publicar el backend):","https://TU-PROYECTO.vercel.app");
+  if(!api)return;
+  const key=prompt("Clave del club (la misma para todos los aparatos):","");
+  if(!key)return;
+  setSyncCfg({api:api.trim().replace(/\/$/,""),club:nombre.trim(),key:key.trim()});
+  toast("Aparato vinculado — sincronizando…");
+  syncPull().then(()=>{closeCust();abrirSync();});
+}
+function vincularConCodigo(){
+  const code=document.getElementById("syncCodeIn").value.trim();
+  if(!code){toast("Pega el código primero");return;}
+  const s=leerCodigoVinculo(code);
+  if(!s||!s.api||!s.club||!s.key){toast("Código inválido");return;}
+  setSyncCfg(s);
+  toast("Vinculado — sincronizando…");
+  syncPull().then(()=>abrirSync());
+}
+function desvincular(){if(!confirm("¿Desvincular este aparato? Seguirá funcionando local, sin sincronizar."))return;localStorage.removeItem("hz_sync");toast("Desvinculado");abrirSync();}
+function copiarCodigo(){const el=document.getElementById("syncCodeOut");el.select();document.execCommand("copy");toast("Código copiado ✓");}
 function resetAll(){localStorage.removeItem("hz_cfg");CFG=load();applyTheme();applyCfg();closeCust();if(STATE.role){buildSide();route(STATE.screen);}}
 function toast(m){const t=document.getElementById("toast");t.textContent=m;t.classList.add("on");clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove("on"),1600);}
 
@@ -459,7 +556,10 @@ const k=(mm)=>"$"+mm.toLocaleString("es-CL")+"k";
 
 /* ═════ LOGIN / SIDEBAR / ROUTER ═════ */
 function renderRoles(){document.getElementById("roleGrid").innerHTML=Object.keys(ROLES).map(r=>`<button class="role-btn ${r==="SOCIO"?"socio":""}" onclick="login('${r}')"><span class="rn">${ROLES[r].icon} ${ROLES[r].label}</span><span class="rd">${ROLES[r].desc}</span></button>`).join("");}
-function login(role){STATE.role=role;STATE.screen=role==="SOCIO"?"socio":"home";HIST=[];document.getElementById("login").style.display="none";document.getElementById("app").classList.add("on");document.getElementById("roleChip").textContent=ROLES[role].icon+" "+ROLES[role].label;buildSide();route(STATE.screen);applyCfg();}
+let POLLING_ON=false;
+function login(role){STATE.role=role;STATE.screen=role==="SOCIO"?"socio":"home";HIST=[];document.getElementById("login").style.display="none";document.getElementById("app").classList.add("on");document.getElementById("roleChip").textContent=ROLES[role].icon+" "+ROLES[role].label;buildSide();route(STATE.screen);applyCfg();
+  if(syncActivo()){syncPull(true);if(!POLLING_ON){POLLING_ON=true;iniciarPolling();}}
+}
 function logout(){document.getElementById("app").classList.remove("on");document.body.classList.remove("menu");document.getElementById("login").style.display="grid";scrollTo(0,0);}
 function buildSide(){const s=document.getElementById("side");
   if(STATE.role==="SOCIO"){s.innerHTML=`<div class="grp">📱 App del socio</div>`+[["socio","🏠","Inicio"],["novedades","📣","Novedades"],["qr","🔳","Mi QR"]].map(navA).join("");return;}
