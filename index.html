@@ -319,9 +319,10 @@ const SEED={
   competencias:[["Campeonato Regional 2026","1° lugar competitivo","01-07 · La Serena"],["Copa Nacional 2026","Por disputar","20-08 · Santiago"]],
   comunicados:[["Inicio de temporada 2026","Este lunes comienzan los entrenamientos del programa competitivo.","Socios",null],["Reunión de apoderados","Convocatoria el sábado 10:00 en la sede principal.","Socios",null],["Cierre de mes","Enviar rendiciones antes del día 30.","Interno",null]],
   socios:[["Amanda Pérez","Infantil","Plan Infantil","ok"],["Benjamín Castro","Infantil","Plan Infantil","ok"],["Colomba Díaz","Infantil","Plan Infantil","bd"],["Emilia Flores","Juvenil","Plan Juvenil","ok"],["Gaspar Herrera","Juvenil","Plan Juvenil","bd"],["Isidora Ibáñez","Juvenil","Plan Juvenil","ok"],["Joaquín Jara","Juvenil","Plan Juvenil","wn"],["Katalina Lagos","Competitivo","Plan Competitivo","ok"],["Lucas Morales","Competitivo","Plan Competitivo","ok"],["Maite Núñez","Competitivo","Plan Competitivo","bd"]],
-  cobrar:[["Katalina Lagos","Campeonatos",180,60],["Lucas Morales","Trajes",90,90],["Maite Núñez","Campeonatos",180,0],["Emilia Flores","Clínica",120,40],["Gaspar Herrera","Trajes",90,0]]
+  cobrar:[["Katalina Lagos","Campeonatos",180,60],["Lucas Morales","Trajes",90,90],["Maite Núñez","Campeonatos",180,0],["Emilia Flores","Clínica",120,40],["Gaspar Herrera","Trajes",90,0]],
+  equipos:[{n:"Equipo Elite",cat:"Competitivo",sede:"La Serena",coach:"C. Rojas",roster:["Katalina Lagos","Lucas Morales","Maite Núñez","Nicolás Ortega"]},{n:"Equipo Juvenil",cat:"Juvenil",sede:"Santiago",coach:"M. Fuentes",roster:["Emilia Flores","Gaspar Herrera","Isidora Ibáñez"]}]
 };
-const DEF={club:"Hit Zero Cheer Chile",logo:null,theme:null,centros:null,gastos:null,competencias:null,comunicados:null,socios:null,cobrar:null,pagosMes:null,perms:null,dash:null};
+const DEF={club:"Hit Zero Cheer Chile",logo:null,theme:null,centros:null,gastos:null,competencias:null,comunicados:null,socios:null,cobrar:null,pagosMes:null,equipos:null,asistencia:null,perms:null,dash:null};
 let CFG=load();
 function load(){let c;try{c=JSON.parse(localStorage.getItem("hz_cfg")||"{}")}catch(e){c={}}
   c=Object.assign({},DEF,c);
@@ -331,11 +332,13 @@ function load(){let c;try{c=JSON.parse(localStorage.getItem("hz_cfg")||"{}")}cat
   if(!c.comunicados)c.comunicados=SEED.comunicados.map(x=>x.slice());
   if(!c.socios)c.socios=SEED.socios.map(x=>x.slice());
   if(!c.cobrar)c.cobrar=SEED.cobrar.map(x=>x.slice());
-  if(!c.pagosMes)c.pagosMes=[]; // [nombre, categoria, mes, monto(miles$), abonado(miles$)]
+  if(!c.pagosMes)c.pagosMes=[]; // [nombre, categoria, mes, monto(miles$), abonado(miles$), estadoCode]
+  if(!c.equipos)c.equipos=(SEED.equipos||[]).map(t=>({...t,roster:[...t.roster]}));
+  if(!c.asistencia)c.asistencia=[]; // [{equipo, fecha, presentes:[nombres]}]
   if(!c.perms)c.perms={};
   if(!c.dash)c.dash=["socios","ingresos","morosidad","ocupacion","chart","cats"];
   return c;}
-function startEmpty(){if(!confirm("Empezar el piloto VACÍO: se borran todos los datos de ejemplo para que ingreses los tuyos. ¿Continuar?"))return;CFG.centros=[];CFG.gastos=[];CFG.competencias=[];CFG.comunicados=[];CFG.socios=[];CFG.cobrar=[];CFG.pagosMes=[];save(true);toast("Piloto en blanco ✓");buildSide();route("datos");}
+function startEmpty(){if(!confirm("Empezar el piloto VACÍO: se borran todos los datos de ejemplo para que ingreses los tuyos. ¿Continuar?"))return;CFG.centros=[];CFG.gastos=[];CFG.competencias=[];CFG.comunicados=[];CFG.socios=[];CFG.cobrar=[];CFG.pagosMes=[];CFG.equipos=[];CFG.asistencia=[];save(true);toast("Piloto en blanco ✓");buildSide();route("datos");}
 function exportJSON(){const b=new Blob([JSON.stringify(CFG,null,2)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="hitzero-respaldo.json";document.body.appendChild(a);a.click();a.remove();toast("Respaldo exportado ✓");}
 function importJSON(ev){const f=ev.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);CFG=Object.assign(load(),d);save(true);applyTheme();applyCfg();buildSide();route("datos");toast("Respaldo importado ✓");}catch(e){alert("Archivo no válido");}};r.readAsText(f);}
 function parseCSV(t){return t.replace(/\r/g,"").split("\n").map(l=>l.trim()).filter(Boolean).map(l=>l.split(/[;,\t]/).map(c=>c.trim()));}
@@ -353,34 +356,39 @@ function dlPlantillaMensualidades(){dl("plantilla_mensualidades",[["Nombre","Cat
  * a la vez — crea/actualiza el atleta, genera su cuenta por cobrar si debe,
  * y suma el ingreso real recaudado al centro de costo "Membresías".
  */
+function estadoCodeDesde(texto){
+  const t=(texto||"").toLowerCase();
+  if(/retir/.test(t))return "ret";
+  if(/moro|deb|atras/.test(t))return "bd";
+  if(/pend|lic|vac|les|wsp/.test(t))return "wn";
+  return "ok";
+}
 function importMensualidadesCSV(ev){const f=ev.target.files[0];if(!f)return;
   const mesSel=document.getElementById("mesSnapshot");const mes=mesSel?mesSel.value:MESES[new Date().getMonth()];
   const r=new FileReader();r.onload=()=>{
   let rows=parseCSV(r.result);if(!rows.length){toast("CSV vacío");return;}
   if(/nombre|categor|monto|estado/i.test(rows[0].join(" ")))rows=rows.slice(1);
-  let nSoc=0,nCob=0,ingresoTotal=0;
-  // limpia cuentas por cobrar de "Mensualidad" para este mes (evita duplicar si se reimporta)
-  CFG.cobrar=CFG.cobrar.filter(c=>!(c[1]===("Mensualidad "+mes)));
+  let nSoc=0,ingresoTotal=0;
   rows.forEach(c=>{
     if(!c[0])return;
-    const nombre=c[0],categoria=c[1]||"",monto=Math.abs(+c[2]||0);
-    const estRaw=(c[3]||"").toLowerCase();
-    const code=/moro|deb|atras/.test(estRaw)?"bd":/pend/.test(estRaw)?"wn":"ok";
-    const abonado=c[4]!==undefined&&c[4]!==""?Math.abs(+c[4]||0):(code==="ok"?monto:0);
+    const nombre=c[0],categoria=c[1]||"";
+    const code=estadoCodeDesde(c[3]);
+    const monto=code==="ret"?0:Math.abs(+c[2]||0);
+    const abonado=code==="ret"?0:(c[4]!==undefined&&c[4]!==""?Math.abs(+c[4]||0):(code==="ok"?monto:0));
     upsertSocio(nombre,categoria,code);nSoc++;
-    upsertPagoMes(nombre,categoria,mes,monto,abonado);
+    upsertPagoMes(nombre,categoria,mes,monto,abonado,code);
     ingresoTotal+=abonado;
-    if(abonado<monto){CFG.cobrar.push([nombre,"Mensualidad "+mes,monto,abonado]);nCob++;}
   });
   save(true);
-  toast(`${nSoc} mensualidades de ${mes} cargadas · ${k(ingresoTotal)} recaudados · ${nCob} con saldo pendiente ✓`);
-  route("datos");
+  toast(`${nSoc} mensualidades de ${mes} cargadas · ${k(ingresoTotal)} recaudados — todo se sincronizó solo ✓`);
+  route("mensual");
 };r.readAsText(f);}
-function dlPlantillaMensualHistorico(){dl("plantilla_mensualidades_historico",[["Nombre","Categoría","Mes","Monto mensual (miles $)","Estado","Abonado (miles $)"],["Ejemplo Atleta","Infantil","Enero","35","Al día","35"],["Ejemplo Atleta","Infantil","Febrero","35","Moroso","0"]]);}
+function dlPlantillaMensualHistorico(){dl("plantilla_mensualidades_historico",[["Nombre","Categoría","Mes","Monto mensual (miles $)","Estado","Abonado (miles $)"],["Ejemplo Atleta","Infantil","Enero","35","Al día","35"],["Ejemplo Atleta","Infantil","Febrero","35","Moroso","0"],["Ejemplo Atleta","Infantil","Marzo","35","Licencia","0"]]);}
 /**
  * Historial multi-mes: una planilla larga (una fila por atleta+mes) carga
  * todo el semestre de una vez. Cada mes queda guardado por separado, así se
- * puede ver la evolución mes a mes en "Mensualidades por mes".
+ * puede ver la evolución mes a mes en "Mensualidades por mes". Estado admite:
+ * Al día / Moroso / Pendiente / Licencia / Retirado.
  */
 function importMensualHistoricoCSV(ev){const f=ev.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{
   let rows=parseCSV(r.result);if(!rows.length){toast("CSV vacío");return;}
@@ -390,18 +398,18 @@ function importMensualHistoricoCSV(ev){const f=ev.target.files[0];if(!f)return;c
     if(!c[0]||!c[2])return;
     const nombre=c[0],categoria=c[1]||"",mes=c[2].trim();
     if(!MESES.includes(mes))return; // mes no reconocido, se omite
-    const monto=Math.abs(+c[3]||0);
-    const estRaw=(c[4]||"").toLowerCase();
-    const code=/moro|deb|atras/.test(estRaw)?"bd":/pend/.test(estRaw)?"wn":"ok";
-    const abonado=c[5]!==undefined&&c[5]!==""?Math.abs(+c[5]||0):(code==="ok"?monto:0);
-    upsertPagoMes(nombre,categoria,mes,monto,abonado);
-    ultimoEstado[nombre]={categoria,code,ordenMes:MESES.indexOf(mes)};
+    const code=estadoCodeDesde(c[4]);
+    const monto=code==="ret"?0:Math.abs(+c[3]||0);
+    const abonado=code==="ret"?0:(c[5]!==undefined&&c[5]!==""?Math.abs(+c[5]||0):(code==="ok"?monto:0));
+    upsertPagoMes(nombre,categoria,mes,monto,abonado,code);
+    const idx=MESES.indexOf(mes);
+    if(!ultimoEstado[nombre]||idx>=ultimoEstado[nombre].ordenMes)ultimoEstado[nombre]={categoria,code,ordenMes:idx};
     mesesSet.add(mes);nFilas++;
   });
   // el socio queda con el estado de su mes MÁS RECIENTE cargado
   Object.entries(ultimoEstado).forEach(([nombre,d])=>upsertSocio(nombre,d.categoria,d.code));
   save(true);
-  toast(`${nFilas} registros de ${mesesSet.size} mes(es) importados ✓`);
+  toast(`${nFilas} registros de ${mesesSet.size} mes(es) importados — Socios, Cobrar, Resultados y Equipos ya reflejan esto ✓`);
   route("mensual");
 };r.readAsText(f);}
 function save(silent){try{localStorage.setItem("hz_cfg",JSON.stringify(CFG));if(!silent)toast("Guardado ✓")}catch(e){alert("No se pudo guardar (archivo muy grande). Prueba un PDF más liviano.")}}
@@ -423,7 +431,6 @@ const DATA={
   bars:[["feb",52,44],["mar",58,47],["abr",63,49],["may",71,52],["jun",84,55],["jul",96,58]],
   socios:[["Amanda Pérez","Infantil","Plan Infantil","ok"],["Benjamín Castro","Infantil","Plan Infantil","ok"],["Colomba Díaz","Infantil","Plan Infantil","bd"],["Emilia Flores","Juvenil","Plan Juvenil","ok"],["Gaspar Herrera","Juvenil","Plan Juvenil","bd"],["Isidora Ibáñez","Juvenil","Plan Juvenil","ok"],["Joaquín Jara","Juvenil","Plan Juvenil","wn"],["Katalina Lagos","Competitivo","Plan Competitivo","ok"],["Lucas Morales","Competitivo","Plan Competitivo","ok"],["Maite Núñez","Competitivo","Plan Competitivo","bd"]],
   cobrar:[["Katalina Lagos","Campeonatos",180,60],["Lucas Morales","Trajes",90,90],["Maite Núñez","Campeonatos",180,0],["Emilia Flores","Clínica",120,40],["Gaspar Herrera","Trajes",90,0]],
-  equipos:[{n:"Equipo Elite",cat:"Competitivo",sede:"La Serena",coach:"C. Rojas",roster:["Katalina Lagos (Capitana)","Lucas Morales","Maite Núñez","Nicolás Ortega"]},{n:"Equipo Juvenil",cat:"Juvenil",sede:"Santiago",coach:"M. Fuentes",roster:["Emilia Flores (Capitana)","Gaspar Herrera","Isidora Ibáñez"]}],
   marketing:[["Reel: rutina Equipo Elite","Instagram","IDEA"],["Entrevista entrenadora","YouTube","IDEA"],["Detrás de cámara clínica","TikTok","PLANIFICADO"],["Convocatoria clase prueba","Instagram","PRODUCCION"],["Resumen campeonato","Instagram","PUBLICADO"]],
   documentos:[["Reglamento interno 2026","Reglamentos"],["Protocolo de seguridad","Protocolos"]],
   traza:[["Administración","REGISTRAR","Gastos","Ingresó gasto de arriendo","hoy 14:55"],["Marketing","EDITAR","Marketing","'Convocatoria' → PRODUCCIÓN","hoy 14:50"],["Finanzas","REGISTRAR","Cuentas por cobrar","Abonó cuota","ayer 18:20"]]
@@ -442,7 +449,7 @@ const GROUPS=[
   {k:"Marketing",icon:"🎬",accent:"#FF4D8D",mods:[["marketing","🗓️","Planificación"]]},
   {k:"Cuerpo deportivo",icon:"🤸",accent:"#3B82F6",mods:[["equipos","🏆","Equipos"],["competencias","🥇","Competencias"]]}
 ];
-const DEFP={FINANZAS:{dashboard:"ver",resultados:"ver",socios:"editar",segmentos:"editar",mensual:"editar",gastos:"editar",cobrar:"editar",informes:"editar"},ADMISION:{dashboard:"ver",socios:"editar",comunicados:"editar",documentos:"editar"},MARKETING:{dashboard:"ver",marketing:"editar",comunicados:"ver",competencias:"ver",documentos:"ver"},TECNICO:{dashboard:"ver",equipos:"editar",competencias:"editar",socios:"ver"}};
+const DEFP={FINANZAS:{dashboard:"ver",resultados:"ver",socios:"editar",segmentos:"editar",mensual:"editar",gastos:"editar",cobrar:"editar",informes:"editar"},ADMISION:{dashboard:"ver",socios:"editar",mensual:"ver",cobrar:"ver",comunicados:"editar",documentos:"editar"},MARKETING:{dashboard:"ver",marketing:"editar",comunicados:"ver",competencias:"ver",documentos:"ver"},TECNICO:{dashboard:"ver",equipos:"editar",competencias:"editar",socios:"ver",mensual:"ver"}};
 let STATE={role:null,screen:"home",_permArea:null};
 let HIST=[];
 function permOf(role,m){if(m==="datos")return role==="ADMIN"?"edit":"none";if(role==="ADMIN")return "edit";if(role==="GERENCIA")return m==="permisos"?"edit":"view";const o=(CFG.perms[role]||{})[m];const val=o!==undefined?o:(DEFP[role]||{})[m];return val==="editar"?"edit":val==="ver"?"view":"none";}
@@ -468,10 +475,22 @@ function route(scr){document.querySelectorAll("#side a").forEach(a=>a.classList.
 function head(t,s){return `<div class="h-row"><div><h1 class="title">${t}</h1>${s?`<p class="subt">${s}</p>`:""}</div></div>`}
 function TW(inner){return `<div class="tw card">${inner}</div>`}
 
-/* ═════ FINANZAS ═════ */
+/* ═════ FINANZAS ═════
+   Modelo: CFG.pagosMes = [nombre, categoria, mes, monto, abonado, estadoCode]
+   estadoCode ∈ ok(Al día) · bd(Moroso) · wn(Licencia/Pendiente) · ret(Retirado)
+   Todo (Socios, Cobrar, Resultados, Equipos) LEE de aquí — una sola fuente de verdad,
+   así una sola carga sincroniza todas las pantallas automáticamente. */
+const ESTADO_LABEL={ok:"Al día",bd:"Moroso",wn:"Licencia",ret:"Retirado"};
+const ESTADO_BADGE={ok:"ok",bd:"bd",wn:"wn",ret:"nt"};
 function gastoDe(code){return CFG.gastos.filter(g=>g[1]===code).reduce((a,g)=>a+g[3],0);}
 function esCentroMembresias(c){return c[1]==="CC-100"||/membres/i.test(c[0]);}
-/** Ingreso real recaudado en pagosMes (todos los meses cargados, o uno solo si se pasa). */
+/** Asegura que exista el centro de costo Membresías — se crea solo, nunca queda huérfano. */
+function ensureCentroMembresias(){
+  let cc=CFG.centros.find(esCentroMembresias);
+  if(!cc){cc=["Membresías","CC-100",0,0];CFG.centros.push(cc);}
+  return cc;
+}
+/** Ingreso real recaudado en pagosMes (todos los meses cargados a la fecha, o uno solo si se pasa). */
 function pagosMesTotal(mes){return CFG.pagosMes.filter(r=>!mes||r[2]===mes).reduce((a,r)=>a+r[4],0);}
 function filas(){return CFG.centros.map(c=>{
   const eg=c[3]+gastoDe(c[1]);
@@ -479,12 +498,28 @@ function filas(){return CFG.centros.map(c=>{
   return{n:c[0],code:c[1],ing,eg,res:ing-eg};
 });}
 function tot(){const f=filas();return{ing:f.reduce((a,x)=>a+x.ing,0),eg:f.reduce((a,x)=>a+x.eg,0)};}
-function saldoC(){return CFG.cobrar.reduce((a,c)=>a+(c[2]-c[3]),0);}
+/** Deuda acumulada real: suma TODO lo cargado hasta la fecha (histórico completo), no solo el último mes. */
+function deudaAcumuladaPorAtleta(){
+  const map={};
+  CFG.pagosMes.forEach(r=>{
+    const [nombre,categoria,mes,monto,abonado,estado]=r;
+    if(!map[nombre])map[nombre]={nombre,categoria,esperado:0,abonado:0,ultimoMes:mes,ultimoEstado:estado,mesesOrden:-1};
+    const o=map[nombre];
+    if(estado!=="ret"){o.esperado+=monto;o.abonado+=abonado;} // retirado no genera deuda
+    const idx=MESES.indexOf(mes);
+    if(idx>=o.mesesOrden){o.mesesOrden=idx;o.ultimoMes=mes;o.ultimoEstado=estado;o.categoria=categoria||o.categoria;}
+  });
+  return Object.values(map).map(o=>({...o,saldo:Math.max(0,o.esperado-o.abonado)}));
+}
+function saldoMensualidadesTotal(){return deudaAcumuladaPorAtleta().reduce((a,o)=>a+o.saldo,0);}
+function saldoC(){return CFG.cobrar.reduce((a,c)=>a+(c[2]-c[3]),0)+saldoMensualidadesTotal();}
 function mesesConDatos(){const set=new Set(CFG.pagosMes.map(r=>r[2]));return MESES.filter(m=>set.has(m));}
-/** Reemplaza (dedupe) las filas de pagosMes de un atleta+mes antes de insertar — permite reimportar sin duplicar. */
-function upsertPagoMes(nombre,categoria,mes,monto,abonado){
+/** Reemplaza (dedupe) las filas de pagosMes de un atleta+mes antes de insertar — permite reimportar/editar sin duplicar.
+ * Crea el centro Membresías automáticamente si aún no existe (nunca deja el dato "huérfano"). */
+function upsertPagoMes(nombre,categoria,mes,monto,abonado,estado){
   CFG.pagosMes=CFG.pagosMes.filter(r=>!(r[0]===nombre&&r[2]===mes));
-  CFG.pagosMes.push([nombre,categoria,mes,monto,abonado]);
+  CFG.pagosMes.push([nombre,categoria,mes,monto,abonado,estado||(abonado>=monto&&monto>0?"ok":"bd")]);
+  ensureCentroMembresias();
 }
 function upsertSocio(nombre,categoria,estadoCode){
   const i=CFG.socios.findIndex(s=>s[0]===nombre);
@@ -527,32 +562,100 @@ function addCentro(){const n=v("ccN"),c=v("ccC")||("CC-"+(CFG.centros.length+1))
 function delCentro(i){if(!confirm("¿Eliminar este centro de costo?"))return;CFG.centros.splice(i,1);save();route("segmentos");}
 /* ═════ Mensualidades por mes ═════ */
 function scrMensual(){
+  const e=canE("mensual");
   const disponibles=mesesConDatos();
-  if(!disponibles.length)return head("Mensualidades por mes","Aún no hay datos cargados")+`<p class="note">Carga tus mensualidades desde <b>⚙️ Datos e importación</b> (Administración) — apenas subas una planilla, aquí verás el detalle mes a mes.</p>`;
+  if(!disponibles.length)return head("Mensualidades por mes","Aún no hay datos cargados")+`<p class="note">Carga tus mensualidades desde <b>⚙️ Datos e importación</b> (Administración) — apenas subas una planilla, todas las pantallas (Socios, Cobrar, Resultados, Equipos) se sincronizan solas.</p>`;
   const mesSel=STATE._mesVista&&disponibles.includes(STATE._mesVista)?STATE._mesVista:disponibles[disponibles.length-1];
   STATE._mesVista=mesSel;
   const filas_=CFG.pagosMes.filter(r=>r[2]===mesSel);
   const recaudado=filas_.reduce((a,r)=>a+r[4],0);
-  const esperado=filas_.reduce((a,r)=>a+r[3],0);
-  const alDia=filas_.filter(r=>r[4]>=r[3]&&r[3]>0).length;
-  const morosos=filas_.filter(r=>r[4]<r[3]).length;
+  const esperado=filas_.filter(r=>r[5]!=="ret").reduce((a,r)=>a+r[3],0);
+  const alDia=filas_.filter(r=>r[5]==="ok").length;
+  const morosos=filas_.filter(r=>r[5]==="bd").length;
+  const licencias=filas_.filter(r=>r[5]==="wn").length;
+  const retirados=filas_.filter(r=>r[5]==="ret").length;
   const tabs=disponibles.map(m=>`<button class="btn sm ${m===mesSel?"":"ghost"}" onclick="setMesVista('${m}')">${m}</button>`).join(" ");
-  const serieMeses=disponibles.map(m=>{const rs=CFG.pagosMes.filter(r=>r[2]===m);return [m.slice(0,3).toLowerCase(),rs.reduce((a,r)=>a+r[4],0),rs.reduce((a,r)=>a+r[3],0)];});
-  const mx=Math.max(1,...serieMeses.flatMap(s=>[s[1],s[2]]));
-  const barsHtml=`<div class="bars">${serieMeses.map(s=>`<div class="col"><div class="bb"><i class="inc" style="height:${s[1]/mx*100}%" title="Recaudado"></i><i class="exp" style="height:${s[2]/mx*100}%" title="Esperado"></i></div><span class="cl">${s[0]}</span></div>`).join("")}</div><div style="display:flex;gap:16px;margin-top:10px;font-size:11.5px;color:var(--muted)"><span>▮ Recaudado</span><span style="opacity:.6">▮ Esperado</span></div>`;
-  const rows=filas_.map(r=>{const st=r[4]>=r[3]&&r[3]>0?["ok","Al día"]:r[4]>0?["wn","Abonó parcial"]:["bd","No pagó"];return `<tr><td style="font-weight:600">${r[0]}</td><td>${r[1]}</td><td style="text-align:right">${k(r[3])}</td><td style="text-align:right">${k(r[4])}</td><td><span class="chip ${st[0]}">${st[1]}</span></td></tr>`}).join("");
-  return head("Mensualidades por mes","Selecciona un mes para ver el detalle y la evolución del semestre")+
-    `<div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px">${tabs}</div>
+  // siguiente mes no cargado aún, para el botón "abrir mes"
+  const idxUltimo=MESES.indexOf(disponibles[disponibles.length-1]);
+  const siguienteMes=idxUltimo>=0&&idxUltimo<11?MESES[idxUltimo+1]:null;
+  const serieMeses=disponibles.map(m=>{const rs=CFG.pagosMes.filter(r=>r[2]===m);return {m:m.slice(0,3).toLowerCase(),rec:rs.reduce((a,r)=>a+r[4],0),esp:rs.filter(r=>r[5]!=="ret").reduce((a,r)=>a+r[3],0),mor:rs.filter(r=>r[5]==="bd").length,ret:rs.filter(r=>r[5]==="ret").length,lic:rs.filter(r=>r[5]==="wn").length};});
+  const mx=Math.max(1,...serieMeses.flatMap(s=>[s.rec,s.esp]));
+  const mxN=Math.max(1,...serieMeses.flatMap(s=>[s.mor,s.ret,s.lic]));
+  const barsHtml=`<div class="bars">${serieMeses.map(s=>`<div class="col"><div class="bb"><i class="inc" style="height:${s.rec/mx*100}%" title="Recaudado"></i><i class="exp" style="height:${s.esp/mx*100}%" title="Esperado"></i></div><span class="cl">${s.m}</span></div>`).join("")}</div><div style="display:flex;gap:16px;margin-top:10px;font-size:11.5px;color:var(--muted)"><span>▮ Recaudado (lo que efectivamente pagaron)</span><span style="opacity:.6">▮ Esperado (lo que correspondía cobrar)</span></div>`;
+  const barsEstado=`<div class="bars">${serieMeses.map(s=>`<div class="col"><div class="bb"><i style="height:${s.mor/mxN*100}%;background:var(--bad)" title="Morosos"></i><i style="height:${s.lic/mxN*100}%;background:var(--warn)" title="Licencias"></i><i style="height:${s.ret/mxN*100}%;background:var(--muted)" title="Retirados"></i></div><span class="cl">${s.m}</span></div>`).join("")}</div><div style="display:flex;gap:16px;margin-top:10px;font-size:11.5px;color:var(--muted)"><span>▮ Morosos</span><span style="color:var(--warn)">▮ Licencias</span><span style="opacity:.6">▮ Retirados</span></div>`;
+  const rows=filas_.map(r=>{const [nombre,categoria,,monto,abonado,est]=r;const st=[ESTADO_BADGE[est]||"nt",ESTADO_LABEL[est]||est];
+    const acciones=e?`<button class="btn sm ghost" onclick="marcarPagado('${nombre.replace(/'/g,"\\'")}','${mesSel}')">✔ Marcar pagado</button> <button class="btn sm ghost" onclick="editarPagoMes('${nombre.replace(/'/g,"\\'")}','${mesSel}')">✎ Editar</button>`:"";
+    return `<tr><td style="font-weight:600">${nombre}</td><td>${categoria}</td><td style="text-align:right">${k(monto)}</td><td style="text-align:right">${k(abonado)}</td><td><span class="chip ${st[0]}">${st[1]}</span></td><td style="text-align:right">${acciones}</td></tr>`;}).join("");
+  return head("Mensualidades por mes","Cada mes queda guardado — el histórico completo alimenta Resultados y Cobrar solo")+
+    `<div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px">${tabs}${e&&siguienteMes?`<button class="btn sm" onclick="abrirMesSiguiente('${siguienteMes}')">+ Abrir ${siguienteMes}</button>`:""}</div>
+    <div class="note" style="margin-bottom:14px">ℹ️ <b>Recaudado</b> = lo que los atletas efectivamente pagaron este mes. <b>Esperado</b> = lo que correspondía cobrarles a todos según su mensualidad (recaudado + lo que aún deben). La diferencia entre ambos es la morosidad del mes.</div>
     <div class="grid g4" style="margin-bottom:14px">
       <div class="kpi" style="--kc:var(--good)"><div class="l">Recaudado en ${mesSel}</div><div class="v num">${k(recaudado)}</div></div>
-      <div class="kpi" style="--kc:var(--c1)"><div class="l">Esperado</div><div class="v num">${k(esperado)}</div></div>
+      <div class="kpi" style="--kc:var(--c1)"><div class="l">Esperado (a cobrar)</div><div class="v num">${k(esperado)}</div></div>
       <div class="kpi" style="--kc:var(--good)"><div class="l">Al día</div><div class="v num">${alDia}</div></div>
       <div class="kpi" style="--kc:var(--bad)"><div class="l">Morosos</div><div class="v num">${morosos}</div></div>
     </div>
-    <div class="card pad" style="margin-bottom:14px"><h3 style="font-size:14px">Recaudado vs. esperado por mes</h3>${barsHtml}</div>
-    ${TW(`<table><thead><tr><td>Atleta</td><td>Categoría</td><td style="text-align:right">Monto</td><td style="text-align:right">Abonado</td><td>Estado</td></tr></thead><tbody>${rows||`<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:22px">Sin registros para ${mesSel}.</td></tr>`}</tbody></table>`)}`;
+    <div class="grid g2" style="margin-bottom:14px">
+      <div class="kpi" style="--kc:var(--warn)"><div class="l">Licencias / pendientes</div><div class="v num">${licencias}</div></div>
+      <div class="kpi" style="--kc:var(--muted)"><div class="l">Retirados</div><div class="v num">${retirados}</div></div>
+    </div>
+    <div class="grid g2" style="margin-bottom:14px">
+      <div class="card pad"><h3 style="font-size:14px">Recaudado vs. esperado por mes</h3>${barsHtml}</div>
+      <div class="card pad"><h3 style="font-size:14px">Morosos, licencias y retirados por mes</h3>${barsEstado}</div>
+    </div>
+    ${e?`<div class="card pad" style="margin-bottom:14px"><h3 style="font-size:14px;margin-bottom:10px">➕ Agregar o registrar pago de un atleta en ${mesSel}</h3><div class="grid g4">
+      <div><label class="fl">Atleta</label><input class="inp" id="mNom" list="listaSocios" placeholder="Nombre exacto"></div>
+      <div><label class="fl">Categoría</label><input class="inp" id="mCat" placeholder="Competitivo…"></div>
+      <div><label class="fl">Monto (miles $)</label><input class="inp" id="mMonto" type="number"></div>
+      <div><label class="fl">Estado</label><select class="inp" id="mEstado"><option value="ok">Al día</option><option value="bd">Moroso</option><option value="wn">Licencia</option><option value="ret">Retirado</option></select></div>
+      </div><datalist id="listaSocios">${CFG.socios.map(s=>`<option value="${s[0]}">`).join("")}</datalist>
+      <button class="btn" style="margin-top:10px" onclick="registrarPagoRapido('${mesSel}')">💾 Guardar en ${mesSel}</button></div>`:""}
+    ${TW(`<table><thead><tr><td>Atleta</td><td>Categoría</td><td style="text-align:right">Monto</td><td style="text-align:right">Abonado</td><td>Estado</td><td></td></tr></thead><tbody>${rows||`<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:22px">Sin registros para ${mesSel}.</td></tr>`}</tbody></table>`)}`;
 }
 function setMesVista(m){STATE._mesVista=m;route("mensual");}
+function marcarPagado(nombre,mes){
+  const r=CFG.pagosMes.find(x=>x[0]===nombre&&x[2]===mes);
+  if(!r)return;
+  r[4]=r[3];r[5]="ok";
+  save(true);toast(`${nombre} marcado como pagado en ${mes} ✓`);route("mensual");
+}
+function editarPagoMes(nombre,mes){
+  const r=CFG.pagosMes.find(x=>x[0]===nombre&&x[2]===mes);
+  if(!r)return;
+  const nuevoMonto=prompt(`Monto mensual de ${nombre} en ${mes} (miles $):`,r[3]);
+  if(nuevoMonto===null)return;
+  const nuevoAbonado=prompt(`Abonado por ${nombre} en ${mes} (miles $):`,r[4]);
+  if(nuevoAbonado===null)return;
+  r[3]=Math.abs(+nuevoMonto||0);r[4]=Math.abs(+nuevoAbonado||0);
+  r[5]=r[4]>=r[3]&&r[3]>0?"ok":(r[5]==="ret"?"ret":"bd");
+  upsertSocio(nombre,r[1],r[5]);
+  save(true);toast(`${nombre} actualizado en ${mes} ✓`);route("mensual");
+}
+function registrarPagoRapido(mes){
+  const nombre=v("mNom");if(!nombre){toast("Ingresa el nombre del atleta");return;}
+  const categoria=v("mCat");const monto=Math.abs(+v("mMonto")||0);const estado=document.getElementById("mEstado").value;
+  const abonado=estado==="ok"?monto:0;
+  upsertPagoMes(nombre,categoria,mes,estado==="ret"?0:monto,estado==="ret"?0:abonado,estado);
+  upsertSocio(nombre,categoria,estado);
+  save(true);toast(`${nombre} registrado en ${mes} ✓`);route("mensual");
+}
+/** Abre el mes siguiente reutilizando el mismo roster y el monto habitual de cada atleta (arrastre automático). */
+function abrirMesSiguiente(mesNuevo){
+  const nombresYaEnMes=new Set(CFG.pagosMes.filter(r=>r[2]===mesNuevo).map(r=>r[0]));
+  const ultimaFilaPorAtleta={};
+  CFG.pagosMes.forEach(r=>{ultimaFilaPorAtleta[r[0]]=r;});
+  let n=0;
+  Object.values(ultimaFilaPorAtleta).forEach(r=>{
+    const nombre=r[0];if(nombresYaEnMes.has(nombre))return;
+    if(r[5]==="ret")return; // los retirados no se re-agregan mes a mes
+    upsertPagoMes(nombre,r[1],mesNuevo,r[3],0,"bd"); // por defecto pendiente hasta que se marque pagado
+    n++;
+  });
+  save(true);
+  STATE._mesVista=mesNuevo;
+  toast(`${mesNuevo} abierto con ${n} atletas del roster — marca "pagado" a medida que abonen ✓`);
+  route("mensual");
+}
 function scrGastos(){const e=canE("gastos");
   const rows=CFG.gastos.slice().reverse().map(g=>{const c=CFG.centros.find(x=>x[1]===g[1]);return `<tr><td>${g[0]}</td><td>${c?c[0]:g[1]}</td><td>${g[2]}</td><td style="color:var(--muted)">${g[4]}</td><td style="text-align:right;font-weight:700;color:var(--bad)">${k(g[3])}</td></tr>`}).join("");
   const opts=CFG.centros.map(c=>`<option value="${c[1]}">${c[0]}</option>`).join("");
@@ -561,21 +664,103 @@ function scrGastos(){const e=canE("gastos");
     (e?`<div class="card pad" style="margin-bottom:14px"><h3 style="font-size:14px;margin-bottom:12px">Registrar gasto</h3><div class="grid g3"><div><label class="fl">Centro de costo</label><select class="inp" id="gCentro">${opts}</select></div><div><label class="fl">Categoría</label><select class="inp" id="gCat" onchange="document.getElementById('gOtro').style.display=this.value==='Otros'?'block':'none'">${cats}</select><input class="inp" id="gOtro" style="display:none;margin-top:6px" placeholder="Especifica el otro gasto"></div><div><label class="fl">Monto (miles $)</label><input class="inp" id="gMonto" type="number" placeholder="850"></div></div><div style="margin-top:10px"><label class="fl">Descripción</label><input class="inp" id="gDesc" placeholder="Detalle"></div><button class="btn" style="margin-top:12px" onclick="addGasto()">💾 Registrar gasto</button></div>`:`<p class="note" style="margin-bottom:14px">Tu área ve los gastos en modo lectura.</p>`)+
     TW(`<div style="display:flex;justify-content:space-between;padding:14px 16px 4px"><h3 style="font-size:14px">Gastos registrados</h3><b style="color:var(--bad)">${k(CFG.gastos.reduce((a,g)=>a+g[3],0))}</b></div><table><thead><tr><td>Fecha</td><td>Centro</td><td>Categoría</td><td>Detalle</td><td style="text-align:right">Monto</td></tr></thead><tbody>${rows}</tbody></table>`);}
 function addGasto(){let cat=v("gCat");if(cat==="Otros")cat=v("gOtro")||"Otros";const c=v("gCentro"),m=Math.abs(+v("gMonto")||0),d=v("gDesc");if(!m){toast("Ingresa un monto");return;}const dd=new Date();CFG.gastos.push([String(dd.getDate()).padStart(2,"0")+"-"+String(dd.getMonth()+1).padStart(2,"0"),c,cat,m,d]);save();route("gastos");}
-function scrCobrar(){const e=canE("cobrar");const rows=CFG.cobrar.map((c,i)=>{const s=c[2]-c[3],st=s===0?["ok","Pagado"]:c[3]>0?["wn","Abonado"]:["bd","Pendiente"];return `<tr><td style="font-weight:600">${c[0]}</td><td>${c[1]}</td><td style="text-align:right">${k(c[2])}</td><td style="text-align:right">${k(c[3])}</td><td style="text-align:right;font-weight:700">${k(s)}</td><td><span class="chip ${st[0]}">${st[1]}</span></td><td style="text-align:right">${e?`${s>0?`<button class="btn sm ghost" onclick="abonar(${i})">Abonar</button> `:""}<button class="btn sm ghost" onclick="delCobro(${i})">🗑</button>`:""}</td></tr>`}).join("");
-  return head("Cuentas por cobrar","Quién debe qué, por atleta y segmento")+`<div class="grid g3" style="margin-bottom:14px"><div class="kpi" style="--kc:var(--c4)"><div class="l">Total por cobrar</div><div class="v num">${k(saldoC())}</div></div><div class="kpi" style="--kc:var(--c1)"><div class="l">Cuotas</div><div class="v num">${CFG.cobrar.length}</div></div><div class="kpi" style="--kc:var(--c3)"><div class="l">Pendientes</div><div class="v num">${CFG.cobrar.filter(c=>c[2]-c[3]>0).length}</div></div></div>`+
+function scrCobrar(){const e=canE("cobrar");
+  const deudaMensual=deudaAcumuladaPorAtleta().filter(d=>d.saldo>0);
+  const rowsMensual=deudaMensual.map(d=>`<tr><td style="font-weight:600">${d.nombre}</td><td>Mensualidad (hasta ${d.ultimoMes})</td><td style="text-align:right">${k(d.esperado)}</td><td style="text-align:right">${k(d.abonado)}</td><td style="text-align:right;font-weight:700;color:var(--bad)">${k(d.saldo)}</td><td><span class="chip bd">Deuda acumulada</span></td></tr>`).join("");
+  const rows=CFG.cobrar.map((c,i)=>{const s=c[2]-c[3],st=s===0?["ok","Pagado"]:c[3]>0?["wn","Abonado"]:["bd","Pendiente"];return `<tr><td style="font-weight:600">${c[0]}</td><td>${c[1]}</td><td style="text-align:right">${k(c[2])}</td><td style="text-align:right">${k(c[3])}</td><td style="text-align:right;font-weight:700">${k(s)}</td><td><span class="chip ${st[0]}">${st[1]}</span></td><td style="text-align:right">${e?`${s>0?`<button class="btn sm ghost" onclick="abonar(${i})">Abonar</button> `:""}<button class="btn sm ghost" onclick="delCobro(${i})">🗑</button>`:""}</td></tr>`}).join("");
+  return head("Cuentas por cobrar","Quién debe qué — mensualidades (automático) y otros segmentos (manual)")+`<div class="grid g3" style="margin-bottom:14px"><div class="kpi" style="--kc:var(--c4)"><div class="l">Total por cobrar</div><div class="v num">${k(saldoC())}</div></div><div class="kpi" style="--kc:var(--c1)"><div class="l">Deuda de mensualidades</div><div class="v num">${k(saldoMensualidadesTotal())}</div></div><div class="kpi" style="--kc:var(--c3)"><div class="l">Otros cobros pendientes</div><div class="v num">${CFG.cobrar.filter(c=>c[2]-c[3]>0).length}</div></div></div>`+
+    `<h3 style="font-size:14px;color:var(--muted);margin-bottom:8px">📅 Mensualidades pendientes (se arma solo desde "Mensualidades por mes")</h3>`+
+    TW(`<table><thead><tr><td>Atleta</td><td>Origen</td><td style="text-align:right">Esperado</td><td style="text-align:right">Abonado</td><td style="text-align:right">Saldo</td><td>Estado</td></tr></thead><tbody>${rowsMensual||`<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:16px">Sin deuda de mensualidades.</td></tr>`}</tbody></table>`)+
+    `<h3 style="font-size:14px;color:var(--muted);margin:16px 0 8px">🧾 Otros cobros (trajes, campeonatos, clínicas…)</h3>`+
     (e?`<div class="card pad" style="margin-bottom:14px"><h3 style="font-size:14px;margin-bottom:12px">Nueva cuenta por cobrar</h3><div class="grid g4"><div><label class="fl">Atleta</label><input class="inp" id="cbN"></div><div><label class="fl">Segmento</label><input class="inp" id="cbS" placeholder="Trajes, Campeonatos…"></div><div><label class="fl">Total (miles $)</label><input class="inp" id="cbT" type="number"></div><div><label class="fl">Abonado (miles $)</label><input class="inp" id="cbA" type="number" placeholder="0"></div></div><button class="btn" style="margin-top:12px" onclick="addCobro()">💾 Agregar</button></div>`:"")+
-    TW(`<table><thead><tr><td>Atleta</td><td>Segmento</td><td style="text-align:right">Total</td><td style="text-align:right">Abonado</td><td style="text-align:right">Saldo</td><td>Estado</td><td></td></tr></thead><tbody>${rows||`<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:22px">Sin cuentas por cobrar.</td></tr>`}</tbody></table>`);}
+    TW(`<table><thead><tr><td>Atleta</td><td>Segmento</td><td style="text-align:right">Total</td><td style="text-align:right">Abonado</td><td style="text-align:right">Saldo</td><td>Estado</td><td></td></tr></thead><tbody>${rows||`<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:22px">Sin otros cobros.</td></tr>`}</tbody></table>`);}
 function addCobro(){const n=v("cbN");if(!n){toast("Ingresa el atleta");return;}CFG.cobrar.push([n,v("cbS"),Math.abs(+v("cbT")||0),Math.abs(+v("cbA")||0)]);save();route("cobrar");}
 function abonar(i){CFG.cobrar[i][3]=CFG.cobrar[i][2];save(true);toast("Abono registrado ✓");route("cobrar");}
 function delCobro(i){if(!confirm("¿Eliminar cuenta?"))return;CFG.cobrar.splice(i,1);save();route("cobrar");}
 function scrSocios(){const e=canE("socios");
-  const rows=CFG.socios.map((s,i)=>{const st={ok:["ok","Al día"],wn:["wn","Pendiente"],bd:["bd","Moroso"]}[s[3]]||["nt",s[3]];return `<tr><td style="font-weight:600">${s[0]}</td><td>${s[1]}</td><td>${s[2]}</td><td><span class="chip ${st[0]}">${st[1]}</span></td><td style="text-align:right">${e?`<button class="btn sm ghost" onclick="delSocio(${i})">Eliminar</button>`:`<span class="chip nt">solo lectura</span>`}</td></tr>`}).join("");
+  const deuda=deudaAcumuladaPorAtleta();
+  const deudaPorNombre={};deuda.forEach(d=>deudaPorNombre[d.nombre]=d);
+  const rows=CFG.socios.map((s,i)=>{
+    const d=deudaPorNombre[s[0]];
+    const stBase=ESTADO_LABEL[s[3]]||s[3];const badge=ESTADO_BADGE[s[3]]||"nt";
+    const mesRef=d?d.ultimoMes:null;
+    const deudaTxt=d&&d.saldo>0?`<div class="chip bd" style="margin-top:4px">Debe ${k(d.saldo)}</div>`:(d&&s[3]!=="ret"?`<div class="chip ok" style="margin-top:4px">Sin deuda</div>`:"");
+    return `<tr><td style="font-weight:600">${s[0]}</td><td>${s[1]}</td><td>${s[2]}</td><td><span class="chip ${badge}">${stBase}${mesRef?` (${mesRef})`:""}</span>${deudaTxt}</td><td style="text-align:right">${e?`<button class="btn sm ghost" onclick="delSocio(${i})">Eliminar</button>`:`<span class="chip nt">solo lectura</span>`}</td></tr>`;}).join("");
   return head("Socios / atletas",`${CFG.socios.length} registrados · la base que alimenta todo`)+
+    (deuda.length?`<div class="note" style="margin-bottom:14px">ℹ️ El <b>Estado</b> muestra el mes más reciente cargado entre paréntesis. <b>"Debe"</b> es la deuda acumulada de TODOS los meses cargados a la fecha, no solo el último.</div>`:"")+
     (e?`<div class="card pad" style="margin-bottom:14px"><h3 style="font-size:14px;margin-bottom:12px">Registrar atleta</h3><div class="grid g4"><div><label class="fl">Nombre</label><input class="inp" id="sN"></div><div><label class="fl">Categoría</label><input class="inp" id="sC" placeholder="Infantil / Juvenil…"></div><div><label class="fl">Plan</label><input class="inp" id="sP" placeholder="Plan Infantil"></div><div><label class="fl">Estado</label><select class="inp" id="sE"><option value="ok">Al día</option><option value="wn">Pendiente</option><option value="bd">Moroso</option></select></div></div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px"><button class="btn" onclick="addSocio()">💾 Registrar</button><label class="btn ghost" style="cursor:pointer">📥 Importar CSV<input type="file" accept=".csv,text/csv" style="display:none" onchange="importSociosCSV(event)"></label><button class="btn ghost" onclick="dlPlantilla()">📄 Descargar plantilla</button></div><p class="subt" style="margin-top:8px">El CSV debe tener columnas: Nombre, Categoría, Plan, Estado. En Excel usa "Guardar como → CSV".</p></div>`:"")+
     TW(`<table><thead><tr><td>Atleta</td><td>Categoría</td><td>Plan</td><td>Estado</td><td></td></tr></thead><tbody>${rows||`<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:22px">Sin atletas. Regístralos o importa un CSV.</td></tr>`}</tbody></table>`);}
 function addSocio(){const n=v("sN");if(!n){toast("Ingresa el nombre");return;}CFG.socios.push([n,v("sC"),v("sP"),document.getElementById("sE").value]);save();route("socios");}
 function delSocio(i){if(!confirm("¿Eliminar atleta?"))return;CFG.socios.splice(i,1);save();route("socios");}
-function scrEquipos(){const e=canE("equipos");return head("Equipos","Se arman desde la base de socios")+`<div class="grid g2">${DATA.equipos.map(t=>`<div class="card pad"><div style="display:flex;justify-content:space-between;align-items:start"><h3 style="font-size:15px">${t.n}</h3>${e?`<button class="btn sm ghost" onclick="demo('Asistencia de ${t.n}')">Asistencia</button>`:""}</div><p class="subt">${t.cat} · ${t.sede} · ${t.coach}</p><div style="margin-top:10px;border-top:1px solid var(--line);padding-top:10px">${t.roster.map(r=>`<div style="font-size:13px;padding:3px 0">• ${r}</div>`).join("")}</div></div>`).join("")}</div>`;}
+/* ═════ Equipos: nómina real + estado de pago + asistencia ═════ */
+function asistenciaSesiones(equipo){return CFG.asistencia.filter(a=>a.equipo===equipo);}
+function asistenciaPct(equipo,atleta){
+  const ses=asistenciaSesiones(equipo);if(!ses.length)return null;
+  const presentes=ses.filter(s=>s.presentes.includes(atleta)).length;
+  return Math.round(presentes/ses.length*100);
+}
+function scrEquipos(){
+  const e=canE("equipos");
+  const deuda={};deudaAcumuladaPorAtleta().forEach(d=>deuda[d.nombre]=d);
+  const abriendoAsistencia=STATE._asistEquipo;
+  const cards=CFG.equipos.map((t,ti)=>{
+    const asist=abriendoAsistencia===t.n;
+    const rosterRows=t.roster.map(nombre=>{
+      const d=deuda[nombre];
+      const stChip=d&&d.saldo>0?`<span class="chip bd">Debe ${k(d.saldo)}</span>`:(d?`<span class="chip ok">Al día</span>`:`<span class="chip nt">sin datos de pago</span>`);
+      const pct=asistenciaPct(t.n,nombre);
+      const pctChip=pct===null?"":`<span class="chip ${pct>=80?"ok":pct>=50?"wn":"bd"}" style="margin-left:5px">${pct}% asistencia</span>`;
+      const checkbox=asist?`<input type="checkbox" class="chkAsist" value="${nombre.replace(/"/g,"&quot;")}" checked style="margin-right:8px">`:"";
+      return `<div style="display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--line)"><span style="font-size:13px">${checkbox}${nombre}</span><span>${stChip}${pctChip}${e&&!asist?` <button class="btn sm ghost" onclick="quitarAtletaEquipo(${ti},'${nombre.replace(/'/g,"\\'")}')">Quitar</button>`:""}</span></div>`;
+    }).join("");
+    const candidatos=CFG.socios.filter(s=>!t.roster.includes(s[0]));
+    return `<div class="card pad">
+      <div style="display:flex;justify-content:space-between;align-items:start;flex-wrap:wrap;gap:6px">
+        <h3 style="font-size:15px">${t.n}</h3>
+        ${e?`<div style="display:flex;gap:6px;flex-wrap:wrap">${asist?`<button class="btn sm" onclick="guardarAsistencia(${ti})">💾 Guardar asistencia</button><button class="btn sm ghost" onclick="cancelarAsistencia()">Cancelar</button>`:`<button class="btn sm ghost" onclick="abrirAsistencia('${t.n.replace(/'/g,"\\'")}')">📋 Tomar asistencia</button><button class="btn sm ghost" onclick="eliminarEquipo(${ti})">🗑 Eliminar equipo</button>`}</div>`:""}
+      </div>
+      <p class="subt">${t.cat} · ${t.sede} · Entrenador/a: ${t.coach}</p>
+      <div style="margin-top:10px">${rosterRows||`<p class="subt">Sin atletas asignados aún.</p>`}</div>
+      ${e&&!asist?`<div style="display:flex;gap:8px;margin-top:10px;align-items:center;flex-wrap:wrap"><select class="inp" id="addAt${ti}" style="max-width:220px"><option value="">Agregar atleta…</option>${candidatos.map(s=>`<option value="${s[0]}">${s[0]}</option>`).join("")}</select><button class="btn sm ghost" onclick="agregarAtletaEquipo(${ti})">+ Agregar</button></div>`:""}
+    </div>`;
+  }).join("");
+  return head("Equipos","Nómina real, estado de pago y asistencia — el entrenador ve todo aquí")+
+    (e?`<div class="card pad" style="margin-bottom:14px"><h3 style="font-size:14px;margin-bottom:12px">Crear equipo</h3><div class="grid g4"><div><label class="fl">Nombre</label><input class="inp" id="eqN" placeholder="Equipo Elite"></div><div><label class="fl">Categoría</label><input class="inp" id="eqC" placeholder="Competitivo"></div><div><label class="fl">Sede</label><input class="inp" id="eqS" placeholder="La Serena"></div><div><label class="fl">Entrenador/a</label><input class="inp" id="eqE" placeholder="Nombre"></div></div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px"><button class="btn" onclick="crearEquipo()">💾 Crear equipo</button><label class="btn ghost" style="cursor:pointer">📥 Importar equipos por CSV<input type="file" accept=".csv,text/csv" style="display:none" onchange="importEquiposCSV(event)"></label><button class="btn ghost" onclick="dlPlantillaEquipos()">📄 Descargar plantilla</button></div><p class="subt" style="margin-top:8px">CSV: Nombre del atleta, Equipo. Si el equipo no existe, se crea solo (igual que en tu Excel).</p></div>`:"")+
+    `<div class="grid g2">${cards||`<p class="note">Aún no hay equipos. Créalos arriba o impórtalos desde tu planilla.</p>`}</div>`;
+}
+function crearEquipo(){const n=v("eqN");if(!n){toast("Ponle un nombre al equipo");return;}CFG.equipos.push({n,cat:v("eqC"),sede:v("eqS"),coach:v("eqE"),roster:[]});save();route("equipos");}
+function eliminarEquipo(i){if(!confirm(`¿Eliminar el equipo "${CFG.equipos[i].n}"? Los atletas no se eliminan.`))return;CFG.equipos.splice(i,1);save();route("equipos");}
+function agregarAtletaEquipo(i){const sel=document.getElementById("addAt"+i);const nombre=sel.value;if(!nombre)return;if(!CFG.equipos[i].roster.includes(nombre))CFG.equipos[i].roster.push(nombre);save();route("equipos");}
+function quitarAtletaEquipo(i,nombre){CFG.equipos[i].roster=CFG.equipos[i].roster.filter(n=>n!==nombre);save();route("equipos");}
+function abrirAsistencia(equipo){STATE._asistEquipo=equipo;route("equipos");}
+function cancelarAsistencia(){STATE._asistEquipo=null;route("equipos");}
+function guardarAsistencia(i){
+  const equipo=CFG.equipos[i].n;
+  const presentes=[...document.querySelectorAll(".chkAsist:checked")].map(c=>c.value);
+  const hoy=new Date();const fecha=String(hoy.getDate()).padStart(2,"0")+"-"+String(hoy.getMonth()+1).padStart(2,"0")+"-"+hoy.getFullYear();
+  CFG.asistencia=CFG.asistencia.filter(a=>!(a.equipo===equipo&&a.fecha===fecha));
+  CFG.asistencia.push({equipo,fecha,presentes});
+  STATE._asistEquipo=null;
+  save(true);toast(`Asistencia de ${equipo} guardada (${presentes.length}/${CFG.equipos[i].roster.length}) ✓`);
+  route("equipos");
+}
+function dlPlantillaEquipos(){dl("plantilla_equipos",[["Nombre atleta","Equipo"],["Ejemplo Atleta","Equipo Elite"]]);}
+function importEquiposCSV(ev){const f=ev.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{
+  let rows=parseCSV(r.result);if(!rows.length){toast("CSV vacío");return;}
+  if(/nombre|atleta|equipo/i.test(rows[0].join(" ")))rows=rows.slice(1);
+  let nEquiposCreados=0,nAsignados=0;
+  rows.forEach(c=>{
+    if(!c[0]||!c[1])return;
+    const nombre=c[0].trim(),equipoNom=c[1].trim();
+    if(!equipoNom)return;
+    let eq=CFG.equipos.find(x=>x.n.toLowerCase()===equipoNom.toLowerCase());
+    if(!eq){eq={n:equipoNom,cat:"",sede:"",coach:"",roster:[]};CFG.equipos.push(eq);nEquiposCreados++;}
+    if(!eq.roster.includes(nombre)){eq.roster.push(nombre);nAsignados++;}
+  });
+  save(true);
+  toast(`${nEquiposCreados} equipos creados · ${nAsignados} atletas asignados ✓`);
+  route("equipos");
+};r.readAsText(f);}
 /* COMUNICADOS con PDF */
 function scrCom(){const e=canE("comunicados");
   const list=CFG.comunicados.map((c,i)=>`<div class="card pad" style="margin-bottom:10px"><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><h3 style="font-size:14.5px">${c[0]}</h3><span class="chip ${c[2]==="Socios"?"ok":"nt"}">${c[2]}</span>${c[3]?`<a class="chip nt" href="${c[3]}" download="${c[0]}.pdf">📄 Descargar PDF</a>`:""}</div><p style="font-size:13px;color:var(--muted);margin-top:5px">${c[1]}</p>${e?`<button class="btn sm ghost" style="margin-top:8px" onclick="delCom(${i})">Eliminar</button>`:""}</div>`).join("");
@@ -638,6 +823,7 @@ function scrDatos(){if(STATE.role!=="ADMIN")return head("Datos")+`<p class="note
       ${importer("Centros de costo","Los segmentos de tu club (Trajes, Campeonatos, Clínica…).","Nombre, Código, Ingresos, Gastos base","importCentrosCSV","dlPlantillaCentros")}
       ${importer("Gastos","Tus gastos ya registrados por segmento.","Fecha, Código centro, Categoría, Monto, Detalle","importGastosCSV","dlPlantillaGastos")}
       ${importer("Cuentas por cobrar","Lo que cada atleta debe por segmento.","Atleta, Segmento, Total, Abonado","importCobrarCSV","dlPlantillaCobrar")}
+      ${importer("Equipos","La columna EQUIPO de tu Excel — crea los equipos y asigna a cada atleta solo.","Nombre atleta, Equipo","importEquiposCSV","dlPlantillaEquipos")}
     </div>
     <p class="note" style="margin-bottom:14px">💡 <b>Tip:</b> importa primero <b>Centros de costo</b> (para tener los códigos CC-xxx) y recién después <b>Gastos</b> — un gasto solo se agrega si su código de centro ya existe.</p>
     <div class="grid g2">
